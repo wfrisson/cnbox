@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+    	<record id="project_issue.mt_issue_escalated" model="mail.message.subtype">
+            <field name="name">Issue Escalated</field>
+            <field name="res_model">project.issue</field>
+            <field name="default" eval="True"/>
+            <field name="description">Issue Escalated</field>
+        </record>
+        <record id="project_issue.mt_project_issue_escalated" model="mail.message.subtype">
+            <field name="name">Issue Escalated</field>
+            <field name="res_model">project.project</field>
+            <field name="default" eval="True"/>
+            <field name="parent_id" eval="ref('project_issue.mt_issue_escalated')"/>
+            <field name="relation_field">project_id</field>
+        </record>
+       
+      
+    </data>
+</openerp>

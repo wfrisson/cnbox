@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+	
+	<!-- Daily Sale Reconciliation END-->
+	<!-- <menuitem name="CNI" id="menu_cni_root" sequence="81" groups="group_cni_admin"/> -->
+  	
+	<!-- <menuitem name="Tools" parent="menu_cni_root" id="menu_cni_ssets" sequence="1" groups=""/> -->
+ 	<!-- <menuitem action="action_asset_req_view" parent="menu_cni_ssets"  sequence="2" id="menu_req_assets" groups=""/> -->
+ 	<!-- <menuitem action="action_asset_req_viewwaitingapproval" parent="menu_cni_ssets"  sequence="3" id="menu_req_assets_waiting" groups=""/> -->
+ 	<!-- <menuitem action="action_asset_return_view" parent="menu_cni_ssets"  sequence="3" id="menu_return" groups=""/> -->
+
+	<!-- <menuitem name="Consumable Items" parent="menu_cni_root" id="menu_sales_heading" sequence="2" groups="group_cni_admin"/> -->
+ 	<!-- <menuitem action="action_daily_sale_reconcile" parent="menu_sales_heading" id="menu_daily_sales" groups="group_cni_admin"/> -->
+
+	<!-- <menuitem name="Client Stock" parent="menu_cni_root" id="menu_client_stock_heading" sequence="2" groups="group_cni_admin"/> -->
+	<!-- <menuitem action="action_get_client_product" parent="menu_client_stock_heading" id="menu_client_stock" groups="group_cni_admin"/> -->
+
+	<!--Project-->
+	<menuitem action="ir_action_filter_projects_emp" id="project.menu_projects" parent="project.menu_project_management" name="Search" sequence="1" groups="group_cni_technician,group_cni_admin,group_cni_project_manager"/>
+	<menuitem action="ir_action_filter_tasks" id="project.menu_action_view_task" parent="project.menu_project_management"  sequence="2" groups="group_cni_technician,group_cni_admin,group_cni_project_manager"/>
+	
+	<!-- <menuitem id="menu_cni_import_project_data_wizard" parent="project.menu_project_management" sequence="" groups="group_cni_admin,group_import_project_data" action="action_import_project_data"/> -->
+	<!--<menuitem action="project.action_view_task" id="project.menu_action_view_task" parent="project.menu_project_management" name="Project Miletones" sequence="5" groups="group_cni_admin"/>-->
+	<!--<menuitem action="action_generic_projects_templates" id="id_project_generic_templates" parent="base.menu_definitions" name="Templates" sequence="5" groups="group_cni_admin"/>-->
+     <!-- project state item -->
+        <!--<menuitem name="Project States"
+            action="action_project_state_colors"
+            id="menu_project_state_colors"
+            parent="base.menu_definitions"
+            groups="group_cni_administrator2,group_cni_admin"
+            sequence="3"/>-->
+    <!--filter on hr_employee-->
+     <menuitem name="Employee" id="menu_act_hr_timesheet_sheet_form_my_current" parent="hr.menu_hr_main" action="ir_actions_open_selected_employee" sequence="1"/>
+     <!--<menuitem name="Time Sheeet" id="menu_act_hr_timesheet_sheet_report" parent="menu_client_stock_heading" groups ="group_cni_administrator2,group_cni_admin" action="action_print_hr_hours" sequence="1"/>-->
+     <!--Expenses-->
+    <menuitem action="hr_expense.expense_all" id="hr_expense.menu_expense_all" groups ="group_cni_admin,group_cni_project_manager" name="Employee Expenses" parent="hr_expense.next_id_49"/>
+     <!--filter expense per employee-->
+    <menuitem action="ir_actions_epenses_per_employee" id="menu_expense_per_emp" groups ="group_cni_technician"  parent="hr_expense.next_id_49"/>
+    <menuitem action ="ir_action_rlter_users" id = "menu_action_res_users2" groups ="group_cni_administrator2,group_cni_admin" parent = "base.menu_users"/>	   
+    <menuitem
+            action="action_prjgraph_graph"
+            id="menu_action_prjgraph_graph_graph"
+            parent="project.menu_project_management"
+			groups = "group_cni_admin"
+            sequence="3"
+        />
+</data>
+</openerp>

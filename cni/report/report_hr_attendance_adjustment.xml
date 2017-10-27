@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+    <record id="view_hr_attendance_adjustemnt_graph" model="ir.ui.view">
+         <field name="name">hr.att.adjustment.report.graph</field>
+         <field name="model">hr.att.adjustment.report</field>
+         <field name="arch" type="xml">
+             <graph string="Adjusted Attendance" type="pivot" stacked="True">
+                 <field name="employee_id" type="row"/>
+                 <field name="create_date" interval="day" type="col"/>
+                 <field name="daily_work_hours" type="measure"/>
+                  <field name="worked_hours" type="measure"/>
+                   <field name="ot_ut" type="measure"/>
+                   <field name="input_adjustment" type="measure"/>
+             </graph>
+         </field>
+    </record>
+
+   
+    <record id="action_hr_attendance_adjustment_all" model="ir.actions.act_window">
+        <field name="name">Adjusted Attendance</field>
+        <field name="res_model">hr.att.adjustment.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">graph</field>
+    </record>
+       <!--Menu access -->
+    <menuitem action="action_hr_attendance_adjustment_all" id="menu_hr_att_adjustment_report_all" parent="hr.menu_hr_reporting" sequence="1"/>
+</data>
+</openerp>

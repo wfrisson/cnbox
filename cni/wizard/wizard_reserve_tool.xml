@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_emp_reserve_asset" model="ir.ui.view">
+            <field name="name">Reserve Tool</field>
+            <field name="model">wizard.reserve.asset</field>
+            <field name="arch" type="xml">
+                <form string="Reserve Tools for your staff">
+                    <field nolabel ="1" name="tool_id" readonly = "1"/>
+                    <group string="">
+                        <newline/><field name="name"/>
+                         <field name="from_date"/>
+                          <field name="to_date"/>
+                          
+                    </group>
+                    <p>Reserve tools for your employee and get it issued when it becomes available</p>
+                    <footer>
+                        <button name="reserve_tool" string="Reserve " type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_reserve_asset" model="ir.actions.act_window">
+            <field name="name">Reserve Tool</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wizard.reserve.asset</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_emp_reserve_asset"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

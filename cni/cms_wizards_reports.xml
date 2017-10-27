@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <report
+            id="report_hr_hours"
+            model="hr.timesheet_sheet_sheet"
+            name="cni.hrhours.report.name"
+            multi="True"
+            rml="cni/report/rml_report_techinican_hours.rml"
+            string="Time"/>
+		   </data>
+</openerp>

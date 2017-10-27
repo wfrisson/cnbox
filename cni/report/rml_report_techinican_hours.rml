@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<document filename="test.pdf">
+ <template pageSize="(630.0,920.0)" title="Crossovered Analytic" author="Inovtec" allowSplitting="20">
+    <pageTemplate id="first">
+      <frame id="first" x1="60.0" y1="5.0" width="510" height="786"/>
+    </pageTemplate>
+  </template>
+  <stylesheet>
+    
+    <blockTableStyle id="Table1">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      </blockTableStyle>
+
+    <blockTableStyle id="Table2">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+       <lineStyle kind="LINEBEFORE" colorName="#000000" start="0,-1" stop="0,-1"/>
+       <lineStyle kind="LINEAFTER" colorName="#000000" start="0,-1" stop="0,-1"/>
+      </blockTableStyle>
+
+	<blockTableStyle id="Table_maintable">
+    	<blockAlignment value="LEFT"/>
+    	<blockValign value="TOP"/>
+		<blockTopPadding length="3.0" start="0,0" stop="-1,-1"/>
+	    <blockBottomPadding length="2.0" start="0,0" stop="-1,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="0,-1" stop="0,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="1,-1" stop="1,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="2,-1" stop="2,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="3,-1" stop="3,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="4,-1" stop="4,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="5,-1" stop="5,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="6,-1" stop="6,-1"/>
+	</blockTableStyle>
+	
+	<blockTableStyle id="Table_maintable_header">
+	    <blockAlignment value="LEFT"/>
+	    <blockValign value="TOP"/>
+		<blockTopPadding length="1.0" start="0,0" stop="-1,-1"/>
+	    <blockBottomPadding length="1.0" start="0,0" stop="-1,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="0,-1" stop="0,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="1,-1" stop="1,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="2,-1" stop="2,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="3,-1" stop="3,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="4,-1" stop="4,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="5,-1" stop="5,-1"/>
+	    <lineStyle kind="LINEBELOW" colorName="#000000" start="6,-1" stop="6,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="0,-1" stop="0,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="1,-1" stop="1,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="2,-1" stop="2,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="3,-1" stop="3,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="4,-1" stop="4,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="5,-1" stop="5,-1"/>
+	    <lineStyle kind="LINEABOVE" colorName="#000000" start="6,-1" stop="6,-1"/>
+		
+		<blockBackground colorName="#ffffff" start="0,0" stop="-1,-1"/>
+	</blockTableStyle>
+    
+    <initialize>
+    <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="P1" fontName="Helvetica" fontSize="11.0" leading="13" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P2" fontName="Helvetica" fontSize="9.0" leading="18" alignment="CENTER"  spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P3" fontName="Helvetica" fontSize="11.0" leading="13" alignment="LEFT" spaceBefore="0.0" spaceAfter="6.0" textColor="#000000"/>
+    <paraStyle name="P4" fontName="Helvetica" fontSize="11.0" leading="13" alignment="LEFT"  spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P5" fontName="Helvetica-Bold" fontSize="11.0" leading="18" alignment="CENTER" spaceBefore="200.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P6" fontName="Helvetica-Bold" fontSize="9.0" leading="14" alignment="LEFT"  spaceBefore="5.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P7" fontName="Helvetica-Bold" fontSize="9.0" leading="14" alignment="CENTER"  spaceBefore="5.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P8" fontName="Helvetica" fontSize="9.0" leading="18" alignment="LEFT"  spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P9" fontName="Helvetica-Bold" fontSize="10.0" leading="11" alignment="LEFT"  spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P10" fontName="Helvetica" fontSize="9.0" leading="18" alignment="LEFT"  spaceBefore="5.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="P11" fontName="Helvetica-Bold" fontSize="9.0" leading="10" alignment="LEFT"  spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+    <paraStyle name="ParaBlack" fontName="Helvetica-Bold" fontSize="13.0" leading="18" alignment="RIGHT" spaceBefore="0.0" spaceAfter="0.0" textColor="#000000"/>
+	<paraStyle name="ParaWhite" fontName="Helvetica" fontSize="9.0" leading="18" alignment="CENTER"  spaceBefore="0.0" spaceAfter="0.0" textColor="#FFFFFF"/>	
+    <images/>
+  </stylesheet>
+  <story>
+	<para style="P1">[[repeatIn(print_form(data['form']),'r')]]</para> 
+		<blockTable colWidths="510" style="Table1">
+			 <tr><td><para style="P5"><u>Employee Hours</u></para></td></tr> 
+			 <tr><td><para style="P5"></para></td></tr>
+			 <tr><td><para style="ParaBlack"><u>[[(r['student_class_status'])]]</u></para></td></tr>
+		</blockTable>
+		
+		
+		<section>
+			<blockTable colWidths="510" style="">
+		    <tr><td>
+		    
+			<blockTable colWidths="40.0,110.0,70.0,70.0,80.0,70.0,70.0" style="Table_maintable_header">
+			<tr>
+		          <td>
+		            <para style="P6">S.No</para>
+		          </td>
+		          <td>
+		            <para style="P6">TITLE OF SUBJECT</para>
+		          </td>
+		          <td>
+		            <para style="P7">Theory</para>
+		          </td>
+		          <td>
+		            <para style="P7">Practical</para>
+		          </td>
+		          
+		          <td>
+		            <para style="P7">M. OBTAINED</para>
+		          </td>
+				<td>
+		            <para style="P7">T.MARKS</para>
+		          </td>
+			  <td>
+		            <para style="P7">PERCENTAGE</para>
+		          </td>
+				
+		      </tr>
+		    </blockTable>
+			</td></tr>
+			<tr><td>
+			
+		   	<blockTable colWidths="40.0,110.0,70.0,70.0,80.0,70.0,70.0" style="Table_maintable">
+			<para style="P1"></para> 
+			<tr>
+				<td>
+					<para style="P10">[[(s['s_no'])]]</para>
+				</td>
+				<td>
+					<para style="P10">[[(s['title'])]]</para>
+				</td>
+				<td>
+					<para style="P2">[[(s['theory'])]]</para>
+				</td>
+				
+				<td>
+					<para style="P2">[[(s['practical'])]]</para>
+				</td>
+				
+				<td>
+					<para style="P2">[[(s['obtained_marks'])]]</para>
+				</td>
+				<td>
+					<para style="P2">[[(s['total_marks'])]]</para>
+				</td>
+				<td>
+					<para style="P2">[[(s['percentage'])]]</para>
+				</td>
+			</tr>
+		   </blockTable>
+		   	</td></tr>
+		   </blockTable>
+		
+		</section>  
+			
+		   <blockTable colWidths="510" style="Table1">
+			<tr><td><para style="P3">Student secured <u>[[(r['total_obtained_percentage'])]] %</u> Marks and is grade <u>[[(r['grade'])]]</u></para></td></tr>
+		  	<tr><td><para style="P3">Position in  class <u>[[(r['position'])]]</u> Out of <u>[[(r['total_students'])]]</u> Students</para></td></tr>
+		  	<tr><td><para style="P3">Remarks: [[(r['remarks'])]]</para></td></tr>
+		  </blockTable>
+		  	
+		  <blockTable colWidths="360.0,150.0" style="Table1">
+			<tr><td><para style="ParaWhite">.</para></td><td></td></tr>
+			<tr>
+				<td><para style="P8">Date Issued: [[print_form(data['form'])]]</para></td>
+				<td><para style="P3"><u>Principal</u></para></td>
+		    </tr>
+		   </blockTable>
+		  	
+		  <blockTable colWidths="510" style="Table1">
+			<tr><td><para style="ParaWhite">[[(r['empty_lines'])]]</para></td></tr>
+			<tr><td><para style="P11">Note: Errors and omissions, if any, are subject to subsequent rectefication.</para></td>
+		    </tr>
+		  </blockTable>
+			
+     </story>
+</document>

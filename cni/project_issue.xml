@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+
+<!--Project transactional Logs-->
+<record id="view_project_issue_transactional_logs_tree" model="ir.ui.view">
+        <field name="name">issue.starting.transactional.logs.tree</field>
+        <field name="model">issue.transactional.log</field>
+        <field name="arch" type="xml">
+        <tree>
+			<field name="event_date"/>
+			<field name="operation"/>
+			<field name="event_by"/>
+            <field name="object_name"/>
+			<field name="column_name" string = "Data Field"/>
+			
+			<field name="pre_value"/>
+			<field name="post_value"/>
+            <field name="project_id" invisible = "1"/>
+        </tree>
+        </field>
+    </record>
+
+<!-- make issue fields invisible-->
+<record model = "ir.ui.view" id = "project_issue_invisble_fields">
+	<field name = "name">project.issue.tabs</field>	
+	<field name = "model">project.issue</field>
+	<field name = "inherit_id" ref = "project_issue.project_issue_form_view"/>
+	<field name = "arch" type = "xml">						
+		<xpath expr="//field[@name='name']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+			
+		<xpath expr="//field[@name='categ_ids']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//label[@for='categ_ids']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+			
+		<xpath expr="//field[@name='user_id']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+			
+		<xpath expr="//field[@name='project_id']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//label[@for='project_id']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+			
+		<xpath expr="//field[@name='id']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr="//field[@name='partner_id']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr="//field[@name='priority']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//field[@name ='version_id']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+			
+		<xpath expr = "//field[@name ='task_id']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//label[@for='task_id']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//label[@for='name']" position = "attributes">
+			<attribute name="string">Flag Name</attribute>
+		</xpath>
+			
+		<xpath expr = "//field[@name ='email_from']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//button[@name='case_escalate']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//page[@string='Extra Info']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//page[@string='Description']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+
+	</field>
+</record>
+<!-- make issue fields invisible-->	
+<record id="action_issue_type" model="ir.actions.act_window">
+    <field name="name">Flag Type</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">issue.type</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_classification" model="ir.actions.act_window">
+    <field name="name">Flag Classification</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">issue.classification</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_category" model="ir.actions.act_window">
+    <field name="name">Flag Category</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">issue.category</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_resolution" model="ir.actions.act_window">
+    <field name="name">Flag Resolution</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">issue.resolution</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_close_conclusion" model="ir.actions.act_window">
+    <field name="name">Flag Conclusion</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">issue.close.conclusion</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_priority" model="ir.actions.act_window">
+    <field name="name">Flag Priority</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">issue.priority</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_safety" model="ir.actions.act_window">
+    <field name="name">Flag Disposition Safety</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">safety.safety</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_facilities" model="ir.actions.act_window">
+    <field name="name">Flag Disposition Facility</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">facilities.facilities</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_processes" model="ir.actions.act_window">
+    <field name="name">Flag Disposition Process</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">processes.processes</field>
+    <field name="view_type">form</field>
+</record>
+<record model = "ir.ui.view" id = "projectissu_main_form_ihrted">
+	<field name = "name">project.issue.formissues</field>	
+	<field name = "model">project.issue</field>
+	<field name = "inherit_id" ref = "project_issue.project_issue_form_view"/>
+	<field name="type">form</field>
+	<field name = "arch" type = "xml">
+		<data>				
+			<div>
+				<field name="name" string = "Flag Name"/>
+				<field name = "hdn_issue_cate" invisible = "1"  width = "33.0%" />
+			</div>
+			<group>
+				<group  width = "100%" col = "4" >
+					<field name = "flag_types" width = "50.0%" />
+					<field name = "issue_classifications" widget="many2many_tags" width = "50.0%" string = "Classification"/>
+				</group>
+				
+				<br/>
+				
+				<group col = "6" width = "100%">
+					<group width = "33%">
+						<field name = "issue_cate" string = "Category"/>
+						<field name = "project_id" string = "Disposition" attrs="{'invisible':[('issue_cate','!=','Projects')]}"/>						
+						<field name = "disposition_asset" attrs="{'invisible':[('issue_cate','!=','Assets')]}"/>
+						<field name = "disposition_safety" attrs="{'invisible':[('issue_cate','!=','Safety')]}"/>
+						<field name = "disposition_employee" attrs="{'invisible':[('issue_cate','!=','Employees')]}"/>
+						<field name = "disposition_client" attrs="{'invisible':[('issue_cate','!=','Clients')]}"/>
+						<field name = "disposition_vender" attrs="{'invisible':[('issue_cate','!=','Venders')]}"/>
+						<field name = "disposition_facility" attrs="{'invisible':[('issue_cate','!=','Facilities')]}"/>
+						<field name = "disposition_material" attrs="{'invisible':[('issue_cate','!=','Material')]}"/>
+						<field name = "disposition_process" attrs="{'invisible':[('issue_cate','!=','Processes')]}"/>
+						<field name = "disposition_other" attrs="{'invisible':[('issue_cate','!=','Other')]}"/>
+						<label for="partner_id"/>
+						<div>
+							<field name = "partner_id" string = "Manager" class="oe_inline"/>
+							<button name="case_escalate" string="⇒ Escalate" type="object" class="oe_link" groups="base.group_user"/> <!-- ➠➤➨➪➲➽⇨ -->
+						</div>
+					</group>
+					<group width = "33%">
+						<field name = "create_date" string = "Created"/>
+						<field name = "id" string = "Flag Reference #"/>
+						<field name = "escalated_on" string = "Escalated On"/>						
+					</group>
+					<group width = "33%">
+						<field name = "user_id" string = "Open By"/>
+						<field name = "issue_prioritys" string = "Priority"/>						
+						<field name = "escalated_by" string = "Escalated By" domain="[('is_company','=',0)]"/>
+					</group>
+				</group>
+				
+				<br/>
+				
+				<group width = "100%" col = "2">
+					<field name = "description"/>
+				</group>
+					<field name = "hdn_issue_cate" width = "33.0%" invisible="1"/>
+			</group>
+			<notebook>
+				<page string = "Close Out">
+					<div align="center">
+                    	<group  width = "100%" col = "6" string = "">
+					
+			                <field width = "33.0%" name="resolution" />
+			                <field width = "33.0%" name="closed_on"    /> 
+			                <field width = "33.0%" name="closed_by"/>
+							
+			                <field width = "33.0%" name="close_conclusion" widget="many2many_tags" /> 
+			                <field width = "33.0%" name="approved_on"   />
+			                <field width = "33.0%" name="approved_by"   />
+			            </group>
+                    	<group  width = "100%" col = "2" string = "">
+							<field name="closeout_desc"  />
+			            </group>
+					</div>
+				</page>
+				
+			    <page string="Action Logs">
+			        <field name="action_logs" colspan="4" nolabel="1">
+			            <tree editable = "top">
+							<field name="dated"/>
+			                <field name="name" string="Action Required"/>
+							<field name="taken_by" string="Taken by"/>
+			                <field name="updates"/>
+							<field name="done"/>			                                
+			            </tree>
+			        </field>
+			    </page>
+				
+				<page string = "Attachments">
+					<div readonly="1" align="center" style="overflow-y: scroll;">
+				        <group  width = "100%" col = "8"  string = "Attached Issue Documents">
+				            <!--<field name="partner_id" invisible = "1"/>-->  
+				            <field name="attached_docs" nolabel = "1" widget="one2many_list" >
+								<tree>
+									<field name="create_date" string = "Create Date"/>
+									<field name="name" string ="Document File Name"  />
+									<field name="datas" filename="datas_fname" string ="Download/Size"/>
+				                    <field name="contact" string = "Source/Author Name"/>
+				                                
+									<field name="company_id" invisible = "1"/>                                
+				                    <field name="write_date" invisible = "1" groups="base.group_no_one"/>
+				                    <field name="type" invisible = "1"/>
+												
+				                    <field name="user_email" string="Email"/>
+				                    <field name="user_phone" string="Office Tel"/>
+				                    <field name="user_cellno" string="Cellular"/>
+								</tree>
+				            </field>
+				        </group>
+					</div>
+				</page>
+				<page string = "History">
+					<field name="issue_transactional_logs" readonly = "1" nolabel = "1"  />
+				</page>
+			</notebook>
+		</data>						
+	</field>
+</record>
+
+<!-- Issue Tabs 
+<record model = "ir.ui.view" id = "project_issue_tabsihrted_tabs">
+	<field name = "name">Project Issue Tracker Form</field>	
+	<field name = "model">project.issue</field>
+	<field name = "inherit_id" ref = "project_issue_sheet.project_issue_form_view"/>
+	<field name = "arch" type = "xml">
+		<xpath expr = "//page[@string ='Worklogs']" position = "attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>						
+	</field>
+</record>-->
+
+</data>
+</openerp>
+    

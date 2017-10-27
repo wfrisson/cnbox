@@ -1,0 +1,3012 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+<data>
+
+	<record model = "ir.ui.view" id = "inherit_timesheet_form22">
+	<field name="name">hr_timesheet_sheet.sheet.forminhg1111</field>
+	<field name="model">hr_timesheet_sheet.sheet</field>
+	<field name = "inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form" />
+	<field name = "arch" type = "xml">
+		<xpath expr = "//field[@name = 'total_attendance']" position = "replace">
+		<field name = "schedule_shift" readonly = "1"/>
+		</xpath>
+		<xpath expr = "//field[@name = 'total_timesheet']" position="attributes">
+		<attribute name="string">Total Timesheet</attribute>
+		</xpath>
+		
+	</field>
+	</record>
+
+  	
+	<record model="ir.ui.view" id="inherit_timesheet_form">
+	<field name="name">hr_timesheet_sheet.sheet.form11</field>
+	<field name="model">hr_timesheet_sheet.sheet</field>
+	<field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
+	<field name="type">form</field>
+	<field name="arch" type="xml">
+		<field name="total_difference" position="after" help="Scheduled Shift - Total Timesheet">
+		<field name="total_overtime"  help="Total Timesheet - Scheduled Shift"/>
+	</field>
+	<notebook>
+		<page string = "Banked Overtime">
+			<group><field name="total_hours" readonly = "1" /><field name="remarks" readonly = "1" /></group>
+			<group><field name="over_under_time" readonly = "1" /></group>
+			<field name="adjustment_ids" context = " {'parent_id':active_id}" />
+			<button name="load_attcendance" string="Show My Attendance" states="new,draft" type="object" class="oe_highlight" groups="base.group_user"/>
+		</page>
+	</notebook>
+	</field>
+	</record>
+
+
+	<record id="timesheett_form_view" model="ir.ui.view">
+		<field name="name">product.template.form2</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_form_view"/>
+		<field name="arch" type="xml">
+			<field name="product_manager" position="after">
+			    <field name="sku"/>
+			    <field name="dimension"/>
+			</field>
+		</field>
+	</record>
+
+        <record id="view_resource_calendar_attendance_form2" model="ir.ui.view">
+            <field name="name">resource.calendar.attendance.form2</field>
+            <field name="model">resource.calendar.attendance</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="resource.view_resource_calendar_attendance_form"></field>
+            <field name="arch" type="xml">
+                <field name="hour_from" position="replace">
+                    <field name="hour_from" />
+                </field>
+                <field name="hour_to" position="replace">
+                    <field name="hour_to"/>
+                </field>
+            </field>
+        </record>
+
+	<record id="view_resource_calendar_attendance_tree2" model="ir.ui.view">
+            <field name="name">resource.calendar.attendance.tree2</field>
+            <field name="model">resource.calendar.attendance</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="resource.view_resource_calendar_attendance_tree"></field>
+            <field name="arch" type="xml">
+                <field name="hour_from" position="replace">
+                    <field name="hour_from" />
+                </field>
+                <field name="hour_to" position="replace">
+                    <field name="hour_to"/>
+                </field>
+            </field>
+        </record>
+	
+	<!--Asset or Tools Requisition-->
+
+	<record id="asset_req_form" model="ir.ui.view">
+		<field name="name">asset.requisition.form</field>
+	    <field name="model">asset.requisition</field>
+	    <field name="arch" type="xml">
+		<form string="Tools">
+			<header>
+	            <button name="send_request" string="Send Request" type="object" states="Draft" class="oe_highlight" groups="base.group_user"/>
+	            <button name="approve_request" string="Approve" type="object" states="Waiting" groups="cni.group_cni_project_manager"/>
+	            <button name="set_draft" string="Set to Draft" type="object" states="Waiting" groups="base.group_user"/>
+				
+				<button name="cancelled_request"  string="Cancel" type="object" states="Draft,Waiting," groups="cni.group_cni_project_manager"/>
+	        	<field  name="state" widget="statusbar" statusbar_visible=",Draft,Waiting,Close,Cancel" statusbar_colors='{"Cancel":"red"}' readonly="1"/>
+	    	</header>
+	    
+			<sheet string="Issue Tools">
+	            <div class="oe_title">
+	            <h1>Request Tools</h1>    
+				<p> Mention the Project and employee that require Tools for clients projects.</p>
+	            <h2><field name="transaction_no" nolabel = "1" attrs="{'invisible':[('state','=','Draft')]}" /></h2>
+	            </div>
+	            <group>
+	                <group string = "Tools Issuance"   >
+						 <field name="project" on_change="onchange_project(project)"  attrs="{'readonly':[('state','!=','Draft')]}"  />
+						 <field name="employee" attrs="{'readonly':[('state','!=','Draft')]}"/>
+	                </group>
+					<group string = "Date,Approval">
+						<field name="date_requisted" attrs="{'readonly':[('state','!=','Draft')]}" />
+						<field name="date_approved" attrs="{'readonly':[('state','!=','Draft')]}" />
+						<field name="aprroved_by" attrs="{'readonly':[('state','!=','Draft')]}" />
+	                </group>
+	           </group> 
+	           <group>
+	                <group string = "Tools Return">
+						<field name="date_returned"  attrs="{'invisible':[('state','!=','Returned')]}" /> 
+						<field name="returned_to" attrs="{'invisible':[('state','!=','Returned')]}" />
+	                </group>
+	            </group>
+	            <notebook>
+	                <page string="Tools Required" attrs="{'readonly':[('state','!=','Draft')]}" >
+	                	<field name="requisition_lines_ids"    widget="one2many_list">
+							<field name="name" attrs="{'readonly':[('state','!=','Draft')]}" /> 
+							<field name="product_qty" attrs="{'readonly':[('state','!=','Draft')]}" /> 
+							<field name="asset_tag" readonly = "1" /> 
+							<field name="pickup_location" readonly = "1" /> 
+					</field>
+	                </page>
+	            </notebook>
+	    	</sheet>
+		</form>
+	    </field>
+    </record>
+
+	<record id="view_asset_req_tree" model="ir.ui.view">
+		<field name="name">asset.requisition.tree</field>
+	    <field name="model">asset.requisition</field>
+	    <field name="arch" type="xml">
+	    <tree colors="blue:state == 'Open',red:state == 'Cancel'" string="Tools Requisition">
+	        <field name="transaction_no"/>
+	        <field name="name"/>
+			 <field name="date_requisted"/>
+	        <field name="state"/>
+	    </tree>
+	    </field>
+	</record>
+
+	<record id="action_asset_req_view" model="ir.actions.act_window">
+	    <field name="name">Request Tools (Draft)</field>
+	    <field name="res_model">asset.requisition</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name= "domain">[('state','=','Draft')]</field>
+	</record>
+
+	<record id="action_asset_req_viewwaitingapproval" model="ir.actions.act_window">
+	    <field name="name">Request Tools</field>
+	    <field name="res_model">asset.requisition</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name= "domain">[('state','in',['Draft','Waiting','Approved'])]</field>
+	</record>
+
+
+	<!--Toole requistion lines-->
+	<record id="view_assetlines_req_tree" model="ir.ui.view">
+			<field name="name">asset.requisition.lines.tree</field>
+		    <field name="model">asset.requisition.lines</field>
+		    <field name="arch" type="xml">
+		    <tree editable = "bottom" string="Tools Requisition">
+				<field name="name" domain="[('reserved','=',False)]"  /> 
+				<field name="notes" readonly = "0" /> 
+				<field name="product_qty" invisible="1"/> 
+				<field name="asset_tag" readonly = "1" /> 
+				<field name="pickup_location" readonly = "0" /> 
+				<field name="state" attrs="{'readonly':[('state','!=','Waiting')]}" /> 
+		        <field name="requisition_id" invisible = "1"/>
+		    </tree>
+		    </field>
+		</record>
+
+
+<!-- Return tools and its lines objects-->
+<record id="returnemp_tools_form" model="ir.ui.view">
+		<field name="name">return.tools.by.employee.form</field>
+	    <field name="model">return.tools.by.employee</field>
+	    <field name="arch" type="xml">
+		<form string="Tools">
+			<header>
+	            <button name="show_tools" string="Next(Display Reserved Tools)" type="object" states="Draft" class="oe_highlight" groups="base.group_user"/>
+				<button name="return_selected_tools" string="NEXT(Return Selected Tools)" type="object" states="Display_Tools" class="oe_highlight" groups="base.group_user"/>
+	        	<field  name="state" widget="statusbar" statusbar_visible="Draft,Display_Tools,Returned" readonly="1"/>
+	    	</header>
+	    
+			<sheet string="Receive Tools from Technician">
+			<script>
+            		alert('Hi there!\nThis JavaScript is going off from within the XML file!')
+        		</script>
+	            <div class="oe_title">
+	            <h1>Return Technician Tools</h1>    
+					<ul>
+						<li> Click Next To Enlist All Tools hold by Selected Employee</li>
+						<li> From tools list shown below, remove tools that are not returned now</li>
+					</ul>
+	            <h2><field name="transaction_no" nolabel = "1" attrs="{'invisible':[('state','=','Draft')]}" /></h2>
+	            </div>
+	            <group>
+	                <group string = "">
+						<field name="employee"  attrs="{'readonly':[('state','!=','Draft')]}"/>
+	                </group>
+					
+	           </group> 
+	           
+	            <notebook>
+	                <page  string="Tools To Returns" attrs="{'readonly':[('state','=','Returned')]}" >
+	                	<field name="return_lines_ids"    widget="one2many_list">
+							<tree>
+							<field name="name" readonly="1" /> 
+							<!--<field name="project_id" attrs="{'readonly':[('state','!=','Draft')]}" /> 
+							<field name="date_issued" readonly = "1" /> -->
+							<field name="return_this_tool"  />
+							</tree>
+							<form>
+							<field name="name" readonly="1" /> 
+							<field name="return_this_tool" string ="Return this tool"  />
+							</form>
+					</field>
+	                </page>
+	            </notebook>
+	    	</sheet>
+		</form>
+	    </field>
+    </record>
+
+	<record id="returnemp_tools_tree" model="ir.ui.view">
+		<field name="name">return.tools.by.employee.tree</field>
+	    <field name="model">return.tools.by.employee</field>
+	    <field name="arch" type="xml">
+	    <tree  string="Return Tools"> 
+	        <field name="transaction_no"/>
+	        <field name="name"/>
+			 <field name="date_returned"/>
+	        <field name="state"/>
+	    </tree>
+	    </field>
+	</record>
+
+	<record id="action_asset_return_view" model="ir.actions.act_window">
+	    <field name="name">Return Tools</field>
+	    <field name="res_model">return.tools.by.employee</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="help" type="html">
+                <p class="oe_view_nocontent_create">Click me! This will show you the CSS demo.
+                </p>
+            </field>
+	</record>
+
+	
+<!-- END of Return tools and its lines-->
+
+	<!--Daily Sale Reconciliation-->
+
+    <record id="sale_reconcile_form" model="ir.ui.view">
+	    <field name="name">daily.material.reconciliation.form</field>
+	    <field name="model">daily.material.reconciliation</field>
+	    <field name="arch" type="xml">
+		<form string="Daily Sale">
+			<header>
+	        	<button name="dispatch_product" string="Request" type="object" states="Draft" class="oe_highlight" groups="base.group_user"/>
+	            <button name="approve_request" string="Approve Material Request" type="object" states="Dispatched" groups="cni.group_cni_project_manager"/>
+				<button name="set_to_draft" string="Send Back For Corrections" type="object" states="Dispatched" groups="base.group_user"/>
+	            <field name="state" widget="statusbar" statusbar_visible=",Draft,Dispatched,Confirmed,Cancel" statusbar_colors='{"Cancel":"blue"}' readonly="1"/>
+	        </header>
+	        
+			<sheet string="Material">
+	            <div class="oe_title">
+	            <h1>Material Request</h1>    
+				<p> Initiate your Material Request process. Material should be reconcile on same form.</p>
+	            <h2><field name="transaction_no" nolabel = "1" attrs="{'invisible':[('state','=','Draft')]}" /></h2>
+	            </div>
+	            <group>
+				<group attrs="{'readonly':[('state','!=','Draft')]}">
+					<field name="project"  on_change="onchange_project(project)"  />
+					 <field name="task_id" />
+					<field name="date_dispatched" />
+					<field name="employee" />
+				</group>
+				<group attrs="{'readonly':[('state','=','Draft')]}">
+					<field name="dispatched_by" />
+					<field name="date_confirmed" />
+					<field name="confirmed_by"  />
+					<field name="client_ref" string="Client Ref #"/>
+				</group>
+	            </group>
+	            <notebook>
+	                <page string="Products" attrs="{'readonly':[('state','!=','Draft')]}">
+	                	<field name="sale_reconcile_lines_ids" />
+	                </page>
+	            </notebook>
+				<group>
+					<p>State Confirm  Mean Transaction is successfully completed</p>
+				</group>
+	        </sheet>
+	    </form>
+	    </field>
+	</record>
+
+ 	<record id="view_sale_reconciliation_tree" model="ir.ui.view">
+	    <field name="name">daily.material.reconciliation.tree</field>
+	    <field name="model">daily.material.reconciliation</field>
+	    <field name="arch" type="xml">
+	        <tree  string="Daily Sale">
+	            <field name="project" />
+	            <field name="employee" />
+	            <field name="state"/>
+	        </tree>
+	    </field>
+    </record>
+
+	<record id="action_daily_sale_reconcile" model="ir.actions.act_window">
+	    <field name="name">Material Request</field>
+	    <field name="res_model">daily.material.reconciliation</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+	    <field name="help" type="html">
+	    	<p class="oe_view_nocontent_create">
+	        Click to add a new version.
+	      	</p>
+			<p>
+	        Define here the different versions of your products on which
+	        you can work on issues and return.
+	      	</p>
+	    </field>
+    </record>
+
+	<record id="view_sale_materiallines_tree" model="ir.ui.view">
+	    <field name="name">daily.sale.material.tree</field>
+	    <field name="model">material.reconcile.lines</field>
+	    <field name="arch" type="xml">
+	    <tree editable = "bottom" string="Daily Material">
+	        <field name="dispatch_qty" string = "Quantity Required"  />
+			<field name="sku" readonly ="1"/>
+			<field name="name"   string = "Product Name"  />
+			<field name="source" string = "Source"/>
+			<field name="pickup_location"/>
+			<field name="state" readonly = "1"/>
+			<field name="notes"/>
+	    </tree>
+	    </field>
+	</record>
+	
+<!--Projct generic types-->
+<record id="project_generictemplate_form" model="ir.ui.view">
+		<field name="name">project.generic.template.form</field>
+	    <field name="model">project.generic.template</field>
+	    <field name="arch" type="xml">
+		<form string="Projects_types">
+			<sheet string="Project Template">
+	            <group string = "Project Template">
+	                <group>
+	                    <field width = "50%" name="name"/>
+						<field  width = "50%" name="desc" />
+	                </group>
+						
+					<group>
+	                    <field width = "50%" name="default_users"/>
+						<field width = "50%" name="planned_hours" widget="float_time" groups = "cni.group_cni_project_manager"/>
+	                   
+	                </group>
+	            </group>
+				<p>
+					<ul>
+						<li>Task template can be used in project.</li>
+						<li>You can create predefine task including activities with budget hours</li>
+						<li>Select a default user e.g Technician</li>
+						<li>This user will appear with task activities in task template</li>
+						<li>You can change this user Technician in actual project when template is loaded</li>
+					</ul>
+				</p>
+			<notebook>
+				<page string = "Task List">
+				<field name="default_task_ids" nolabel = "1" />
+				</page>
+			</notebook>
+	    	</sheet>
+		</form>
+	    </field>
+    </record>
+    <record id="project_generictypes_tree" model="ir.ui.view">
+		<field name="name">project.generic.template.tree</field>
+	    <field name="model">project.generic.template</field>
+	    <field name="arch" type="xml">
+	    <tree string="Project Generic Templates">
+			<field name="create_date"  string = "Create Date"  />
+	        <field name="name"/>
+			<field name="desc"/>
+			<field name="planned_hours" widget="float_time" groups = "cni.group_cni_project_manager"/>
+	    </tree>
+	    </field>
+	</record>
+
+<record id="action_generic_projects_templates" model="ir.actions.act_window">
+	    <field name="name">Task Template</field>
+	    <field name="res_model">project.generic.template</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+	    <field name="help" type="html">
+	    	<p class="oe_view_nocontent_create">
+	        Click to /add New Project Template.
+	      	</p>
+			
+	    </field>	
+	</record>  
+
+    
+    <record id="project_default_tasks_form" model="ir.ui.view">
+		<field name="name">project.tasks.default.form</field>
+	    <field name="model">project.tasks.default</field>
+	    <field name="arch" type="xml">
+		<form string="Tasks in Project">
+			<sheet string="Project Tasks">
+	            <group>
+					<group>
+						<field name="name" width = "50%" required = "1" />
+						<field name="project_template_id" width = "50%" readonly = "1" />	
+	                </group>
+	                <group>
+						<field name="planned_hours_task" widget="float_time" width = "50%" groups = "cni.group_cni_project_manager"/>
+						<field name="user_id" invisible = "1" />
+						<field name = "repitition" width = "50%"/>
+	                </group>			    
+	            </group>
+	            <p>
+					<ul>
+						<li>Initially planned hours should not exceed project total hours.</li>
+						<li>Each Task belongs to a project type shown above.</li>
+						<li>After giving a task name, define task activities in the following list.</li>
+						<li>Assign expected user and time required for each task and its activities.</li>
+					</ul>
+				</p>		 
+				<notebook>
+	                <page string="Tasks Activities " >
+	                	<field name="project_task_work_ids" nolabel = "1"/>
+	                </page>
+	            </notebook>
+	    	</sheet>
+		</form>
+	    </field>
+    </record>
+
+	<record id="project_project_tasks_tree" model="ir.ui.view">
+		<field name="name">project.tasks.default.tree</field>
+	    <field name="model">project.tasks.default</field>
+	    <field name="arch" type="xml">
+	    <tree string="Tasks">
+	        <field name="name"/>
+		<field name = "repitition"/>
+	        <field name="user_id" invisible = "1"/>
+	        <field name="planned_hours_task" widget="float_time" groups = "cni.group_cni_project_manager"/>
+	    </tree>
+	    </field>
+	</record>
+
+
+<record model="ir.ui.view" id="view_task_activity_form1">
+    <field name="name">project.task.workinherit1</field>
+    <field name="model">project.task.work</field>
+    <field name="inherit_id" ref="project.view_task_work_tree"/>
+    <field name="arch" type="xml">
+        <field name="user_id" position="replace">
+            <field name="user_id"  readonly="1"/>
+           
+		</field>
+    </field>
+</record>
+
+
+<!--Project Task default Activitiess-->
+
+<!--task work-->
+<record id="project_task_activity_tree_default" model="ir.ui.view">
+		<field name="name">project.task.work.default.tree</field>
+	    <field name="model">project.task.work.default</field>
+	    <field name="arch" type="xml">
+	    <tree editable = "bottom" string="Task Activities">
+	        <field name="name"/>
+			<field name = "repitition"/>
+	        <field name="user_id" invisible = "1"/>
+	        <field name="hours" widget="float_time" groups = "cni.group_cni_project_manager"/>	
+			       
+	    </tree>
+	    </field>
+	</record>
+
+	 
+<!--Client stock provision-->
+
+	<record id="client_stock_provide_form" model="ir.ui.view">
+		<field name="name">get.client.stock.form</field>
+	    <field name="model">get.client.stock</field>
+	    <field name="arch" type="xml">
+		<form string="Tools">
+			<header>
+	            <button name="add_to_stock" string="Ad To Stock" type="object" states="Draft" class="oe_highlight" groups="base.group_user"/>
+	            <button name="confirm_add_to_stock" string="Confirm Add To Stock" type="object" states="Waiting" groups="base.group_user"/>
+				<button name="cancelled_stock_reception" string="Cancel" type="object" states="Draft,Waiting" groups="base.group_user"/>
+	        	<field name="state" widget="statusbar" statusbar_visible=",Draft,Waiting,In_Stock,Waiting_Stockout,Stockout,Cancel" statusbar_colors='{"Cancel":"red"}' readonly="1"/>
+	    	</header>
+	    
+			<sheet string="Add Clinet stock">
+	            <div class="oe_title">
+	            <h2>Client Stock</h2>    
+				<p>Add Client material to existing stock,Use the same form to handover back to client </p>
+	            </div>
+	            <group>
+	                <group  attrs="{'readonly':[('state','!=','Draft')]}" >
+	                    <field name="project" on_change="onchange_project(project)" attrs="{'readonly':[('state','!=','Draft')]}" />
+						<field name="partner_id" />
+						<field name="date_received" attrs="{'readonly':[('state','!=','Draft')]}" />
+	                </group>
+					<group>
+						<field name="aprroved_by" readonly = "1"/>
+						<field name="location_id" required = "1"/>
+	                </group>
+	            </group>
+	            <notebook>
+	                <page string="Assets" >
+	                	<field name="stock_lines_ids" attrs="{'readonly':[('state','!=','Draft')]}"/>
+	                </page>
+					<page string="Note" >
+	                	<field name="note" placeholder  = "Leave note here....."  attrs="{'readonly':[('state','in',['Approved','Cancel'])]}"/>
+	                </page>
+	            </notebook>
+	    	</sheet>
+		</form>
+	    </field>
+    </record>
+
+	<record id="get_client_product_tree" model="ir.ui.view">
+		<field name="name">get.client.stock.tree</field>
+	    <field name="model">get.client.stock</field>
+	    <field name="arch" type="xml">
+	    <tree string="Client Stock">
+	        <field name="project"/>
+	        <field name="partner_id"/>
+	        <field name="state"/>
+	    </tree>
+	    </field>
+	</record>
+
+	<record id="action_get_client_product" model="ir.actions.act_window">
+	    <field name="name">Client Stockables</field>
+	    <field name="res_model">get.client.stock</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+	    <field name="help" type="html">
+	    	<p class="oe_view_nocontent_create">
+	        Click to add a new version.
+	      	</p>
+			<p>
+	        Define here the different versions of your tools on which
+	        you can work on issues.
+	      	</p>
+	    </field>	
+	</record>
+
+
+	<!--Client stock lines-->
+	<record id="view_client_stockline_tree" model="ir.ui.view">
+			<field name="name">client.stock.lines.tree</field>
+		    <field name="model">client.stock.lines</field>
+		    <field name="arch" type="xml">
+		    <tree editable = "bottom" string="Tools Requisition">
+		        <field name="name"/>
+		        <field name="product_qty" on_change="onchange_qty(product_qty,price_unit)"/>
+				<field name="price_unit" on_change="onchange_qty(product_qty,price_unit)"/>
+				<field name="total"/>
+		    </tree>
+		    </field>
+		</record>
+
+<!--Tools Reserevation by employee-->
+	<record id="view_tools_reservation_tree" model="ir.ui.view">
+			<field name="name">tools.reservation.tree</field>
+		    <field name="model">emp.tools.reservation</field>
+		    <field name="arch" type="xml">
+		    <tree string="Tools Reservation">
+		        <field name="name"/>
+		        <field name="tool_to_reserve" invisible = "1"/>
+				<field name="date_from"/>
+				<field name="date_to"/>
+				<field name="reserved_by"/>
+				<field name="issued"/>
+		    </tree>
+		    </field>
+		</record>
+
+<!--Tree view for utility based project materials-->
+			
+
+<record id="view_project_material_tree" model="ir.ui.view">
+			<field name="name">project.material.tree</field>
+		    <field name="model">project.material</field>
+		    <field name="arch" type="xml">
+		    <tree editable = "bottom" string="Tools Reservation">
+				<field name="mat_desc" readonly = "1"/>
+				<field name="req_quantiity" readonly = "1"/>
+		        <field name="shiping_date" readonly = "1"/>
+				 <field name="material_req_date" readonly = "1"/>
+		        <field name="delivery_pa" readonly = "1"/>
+				<field name="delivery_date" readonly = "1"/>
+				 <field name="pa_gi_doc" readonly = "1"/>
+		        <field name="gi_date" readonly = "1"/>
+				<field name="po_pa" readonly = "1"/>
+				 <field name="remarks" />
+		    </tree>
+		    </field>
+		</record>
+
+<!-- Asset State Form View  -->        
+        <record id="asset_state_form_view" model="ir.ui.view">
+            <field name="name">asset.state.form</field>
+            <field name="model">asset.state</field>
+            <field name="arch" type="xml">
+                <form string="State" version="7.0">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name"/>
+                            <h1><field name="name" class="oe_inline"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="state_color"/>
+                                <field name="team"/>
+                            </group>
+                            <group>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+<record id="act_project_project_2_project_closed" model="ir.actions.act_window">
+            <field name="res_model">project.issue</field>
+            <field name="view_type">form</field>
+            <field name="name">Issues Closed</field>
+            <field name="view_mode">kanban,tree,form,calendar,graph</field>
+            <field name="context">{
+                    'search_default_project_id': [active_id],
+                    'default_project_id': active_id,
+                }
+            </field>
+        </record>
+ <!--        
+this code may be later on uncommented when we successfull separating tasks stages and issues stages
+<record model="ir.ui.view" id="inherit_issue_form21">
+		      <field name="name">project.issue.inherit11</field>
+		      <field name="model">project.issue</field>
+		      <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		     <xpath expr = "//field[@name ='stage_id']" position = "replace">
+				<field name="stages" widget="statusbar" clickable="True"
+                            options="{'fold_field': 'fold'}"/>
+				</xpath>
+		      </field>
+		    </record> -->
+
+        <!--  View  -->
+        <record model="ir.ui.view" id="projectsst_state_kanban_view">
+            <field name="name">Projects State Kanban</field>
+            <field name="model">project.state.color</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="object">
+                    <field name="name"/>
+                    <field name="object"/>
+                    <field name="state_color"/>
+                    <field name="sequence" widget="handle"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_card codup_kanban_status oe_kanban_global_click">
+                                <h4>
+                                <a name="change_color" string="Change color" type="object"><span t-attf-class="codup_status_color_#{record.state_color.raw_value} codup_status"></span></a>
+                                <field name="name"/>
+                                </h4>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="action_project_state_colors" model="ir.actions.act_window">
+            <field name="name">Project States Colors</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.state.color</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,form</field>
+        </record>
+<!--......action for draft project hacing tags = punsub.....-->
+<record id="action_draft_projects" model="ir.actions.act_window">
+	    <field name="name">PubSub Projects</field>
+	    <field name="res_model">project.project</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name= "domain">[('data_sources_values','=','PubSub'),('state','=','draft')]</field>
+	</record>
+
+
+<!--......Project Kanban modified......-->
+
+<record id="view_project_kanban_inherited" model="ir.ui.view">
+    <field name="name">project.project.kanban.modified</field>
+    <field name="model">project.project</field>
+    <field name="inherit_id" ref="project.view_project_kanban"/>
+    <field name="arch" type="xml">
+		
+		<xpath expr="//div[contains(@class, 'oe_dropdown_toggle oe_dropdown_kanban')]" position="before">
+            <field name="maintenance_state_id" invisible = "1" />
+				<field name="maintenance_state_color" invisible = "1" />    
+				<field name="maintenance_state_kanban_display" invisible = "1" />    
+			<div t-attf-title="#{record.maintenance_state_kanban_display.value}" t-attf-class="codup_status_color_#{record.maintenance_state_color.raw_value} codup_status"></div>						
+        </xpath>
+		
+		<xpath expr = "//field[@name ='doc_count']"   position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		
+		<xpath expr="//div[contains(@class, 'oe_kanban_project_list')]"  position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		
+		<xpath expr="//div[contains(@class, 'oe_kanban_footer_left')]"  position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+		
+		<xpath expr="//div[contains(@class, 'text-center')]" position="after">
+            <field name="project_types" invisible = "1" />
+			<field name="date_start" invisible = "1" />
+			<field name="hours_budget_remain"  invisible = "1"/>
+			<field name="date" invisible = "1" />
+			<div class="oe_kanban_footer_left">
+				<span t-if="record.partner_id.raw_value" style="white-space:nowrap" title="Client">
+					<i class="fa fa-users" aria-hidden="true"></i>
+					<field name="partner_id"/>
+				</span>				
+				<div title="Project Types">
+					<field name="project_types"/>
+				</div>
+					
+				<br/>
+					
+				<div class="oe_kanban_footer_left"> <!-- align="center" -->
+					<span title="Start Date">
+						<i class = "fa fa-calendar" aria-hidden = "true"></i>
+						<field name="date_start" widget="date"/>
+					</span>
+					<span t-if="record.date.raw_value" title="Due Date">
+						<i class = "fa fa-calendar" aria-hidden = "true"></i> 
+					<field name="date" widget="date"/>
+					</span>
+				</div>
+				<div class="oe_kanban_footer_left" align="center" groups = "cni.group_cni_project_manager">
+					<span t-if="record.hours_budget_remain" title="Budget Remaining Hours"><i class = "fa fa-clock-o" aria-hidden = "true"></i>
+						<field name="hours_budget_remain" widget="float_time"/>
+					</span>
+				</div>
+			</div>
+			<div style="color:#7C7BAD; margin-bottom: -1.5em;">
+				<field name = "project_progress" widget="gauge"/>
+			</div>
+			<div class="oe_kanban_footer_left" align="left" title="Work Location">
+				<span t-if="record.work_location.raw_value">
+					<i class="fa fa-map-marker" aria-hidden="true"></i>
+					<field name="work_location"/>
+					<!-- expandable message layout -->
+					<t t-name="mail.thread.expandable">
+						<div t-attf-class="oe_msg oe_msg_#{widget.type} #{widget.max_limit ? 'oe_max_limit' : ''} #{widget.thread_level and widget.options.display_indented_thread > -1 ? 'oe_msg_indented' : ''}">
+							<div class="oe_msg_content oe_msg_more_message">
+								<div class='oe_separator'></div>
+								<a t-if="widget.nb_messages &lt;= 0" class="oe_msg_fetch_more">show more ....</a>
+								<a t-if="widget.nb_messages === 1" class="oe_msg_fetch_more">show one more message</a>
+								<a t-if="widget.nb_messages &gt; 1" class="oe_msg_fetch_more">show <t t-esc="widget.nb_messages" /> more messages</a>
+							</div>
+						</div>
+					</t>
+				</span>
+			</div>
+        </xpath>
+
+		<xpath expr="//div[contains(@class, 'oe_kanban_project_avatars')]"  position="replace">
+			<div class="oe_kanban_project_avatars">
+                <t t-foreach="record.members.raw_value.slice(0,5)" t-as="member">
+                    <img t-att-src="kanban_image('res.users', 'image_small', member)" t-att-data-member_id="member"/>
+                </t>
+			</div>
+		</xpath>
+		
+		<xpath expr="//div[contains(@class, 'oe_kanban_project_list')]" position="invisible"></xpath>
+
+        </field>
+		
+    </record>
+
+<!--........................................................................-->
+
+
+<!--Timesheet tree inherited -->
+
+<record model = "ir.ui.view" id = "timesshet_tree_inh1">
+<field name = "name">timesheet.tree.inherited</field>
+<field name = "model">hr_timesheet_sheet.sheet</field>
+<field name = "inherit_id" ref = "hr_timesheet_sheet.hr_timesheet_sheet_tree_simplified"/>
+<field name = "arch" type = "xml">
+	<xpath expr = "//field[@name = 'employee_id']" position = "after">
+		<field name = "week_no"/>
+	</xpath>
+</field>
+</record>
+
+
+<record id="view_project_logs_tree" model="ir.ui.view">
+        <field name="name">project.starting.closding.logs.tree</field>
+        <field name="model">project.starting.closding.logs</field>
+        <field name="arch" type="xml">
+        <tree colors="name == 'Project is closed',red:name == 'Project is Canceled',green:name == 'Project is Re-Opened'" >
+            <field name="name"/>
+            <field name="project_id" invisible = "1"/>
+            <field name="event_date"/>
+             <field name="event_by"/>
+        </tree>
+        </field>
+    </record>
+
+<!--Project transactional Logs-->
+<record id="view_project_transactional_logs_tree" model="ir.ui.view">
+        <field name="name">project.starting.transactional.logs.tree</field>
+        <field name="model">project.transactional.log</field>
+        <field name="arch" type="xml">
+        <tree>
+			<field name="event_date"/>
+			<field name="operation"/>
+			 <field name="event_by"/>
+            <field name="object_name"/>
+			<field name="column_name" string = "Data Field"/>
+			
+			<field name="pre_value"/>
+			<field name="post_value"/>
+            <field name="project_id" invisible = "1"/>
+			<field name="task_id" invisible = "1"/>
+			<field name="work_id" invisible = "1"/>
+            
+            
+        </tree>
+        </field>
+    </record>
+
+	
+<record id = "view_client_contact_list_form" model = "ir.ui.view">
+	<field name = "name">client.contact.list.form</field>
+	<field name = "model">client.contact.list</field>
+	<field name = "arch" type = "xml">
+		<form>
+			<group>
+				<field name="parent_project" invisible="1"/>								
+				<field name="subpartner_id" invisible="1"/>								
+				<field name="name"/>								
+				<field name="phoneNumberTxt"/>								
+				<field name="cellNumberTxt"/>								
+				<field name="emailTxt"/>								
+				<field name="address"/>	
+			</group>
+		</form>
+	</field>
+</record>
+
+<record id = "view_client_contactlist_tree" model = "ir.ui.view">
+	<field name = "name">client.contact.list.tree</field>
+	<field name = "model">client.contact.list</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "phoneNumberTxt"/>
+		<field name = "cellNumberTxt"/>
+		<field name = "emailTxt"/>
+		<field name = "address"/>
+	</tree>
+</field>
+</record>
+<record id = "view_workorder_attribute_list_tree" model = "ir.ui.view">
+	<field name = "name">workorder.attribute.list.tree</field>
+	<field name = "model">workorder.attribute.list</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "text"/>
+	</tree>
+</field>
+</record>
+<record id = "view_workorder_details_list_tree" model = "ir.ui.view">
+	<field name = "name">workorder.details.list.tree</field>
+	<field name = "model">workorder.details.list</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "text"/>
+	</tree>
+</field>
+</record>
+<record id = "view_project_jobtype_tree" model = "ir.ui.view">
+	<field name = "name">project.jobtype.tree</field>
+	<field name = "model">project.jobtype</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "code_value"/>
+	</tree>
+</field>
+</record>
+<record id = "view_project_product_category_tree" model = "ir.ui.view">
+	<field name = "name">project.product.category.tree</field>
+	<field name = "model">project.product.category</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "code_value"/>
+	</tree>
+</field>
+</record>
+<record id = "view_project_product_technology_tree" model = "ir.ui.view">
+	<field name = "name">project.product.technology.tree</field>
+	<field name = "model">project.product.technology</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "code"/>
+		<field name = "name"/>
+	</tree>
+</field>
+</record>
+<record id = "view_serviceidentification_no_tree" model = "ir.ui.view">
+	<field name = "name">serviceidentification.no.tree</field>
+	<field name = "model">serviceidentification.no</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "text"/>
+	</tree>
+</field>
+</record>
+<record id = "view_project_classification_tree" model = "ir.ui.view">
+	<field name = "name">project.classification.tree</field>
+	<field name = "model">project.classification</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+	</tree>
+</field>
+</record>
+<record id = "view_project_customer_type_tree" model = "ir.ui.view">
+	<field name = "name">project.customer.type.tree</field>
+	<field name = "model">project.customer.type</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+	</tree>
+</field>
+</record>
+<record id = "view_project_serviceclass_tree" model = "ir.ui.view">
+	<field name = "name">project.serviceclass.tree</field>
+	<field name = "model">project.serviceclass</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "code"/>
+	</tree>
+</field>
+</record>
+<record id = "view_cust_contactlist_tree" model = "ir.ui.view">
+	<field name = "name">cust.contactlist.tree</field>
+	<field name = "model">cust.contactlist</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "typeCd"/>
+		<field name = "phoneNumberTxt"/>
+		<field name = "phoneLocationCd"/>
+		<field name = "parent_project" invisible="1"/>
+	</tree>
+</field>
+</record>
+<record id = "view_modify_data_source_tree" model = "ir.ui.view">
+	<field name = "name">modify.data.source.tree</field>
+	<field name = "model">modify.data.source</field>
+	<field name = "arch" type = "xml">
+	<tree> 
+		<field name = "name"/>
+		<field name = "desc"/>
+	</tree>
+</field>
+</record>
+
+<record id="action_workorder_attribute_list" model="ir.actions.act_window">
+    <field name="name">WO Attribute List</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">workorder.attribute.list</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_workorder_details_list" model="ir.actions.act_window">
+    <field name="name">WO Details List</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">workorder.details.list</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_jobtype" model="ir.actions.act_window">
+    <field name="name">WO Job Type</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.jobtype</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_product_category" model="ir.actions.act_window">
+    <field name="name">WO Product Category</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.product.category</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_product_technology" model="ir.actions.act_window">
+    <field name="name">WO Product Technology</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.product.technology</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_workforce_segment" model="ir.actions.act_window">
+    <field name="name">WO Workforce Segment</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">workforce.segment</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_serviceidentification_no" model="ir.actions.act_window">
+    <field name="name">WO Service Identification</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">serviceidentification.no</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_classification" model="ir.actions.act_window">
+    <field name="name">WO Classification</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.classification</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_customer_type" model="ir.actions.act_window">
+    <field name="name">WO Customer Type</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.customer.type</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_serviceclass" model="ir.actions.act_window">
+    <field name="name">WO Service Class</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.serviceclass</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_project_order" model="ir.actions.act_window">
+    <field name="name">WO Work Order Action</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.order.action</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_contactlist" model="ir.actions.act_window">
+    <field name="name">WO Contact List</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.contactlist</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_location_type" model="ir.actions.act_window">
+    <field name="name">WO Contact List Type</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.location.type</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_phone_location" model="ir.actions.act_window">
+    <field name="name">WO Contact List Phone Location</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.phone.location</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_location" model="ir.actions.act_window">
+    <field name="name">Work Order Location</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.location</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_location_civic_address" model="ir.actions.act_window">
+    <field name="name">Work Order Location Civic Address</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.location.civic.address</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_location_geocode_address" model="ir.actions.act_window">
+    <field name="name">Work Order Location Geocode Address</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.location.geocode.address</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_cust_location_region_hierarchy" model="ir.actions.act_window">
+    <field name="name">Work Order Location Region Hierarchy</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">cust.location.region.hierarchy</field>
+    <field name="view_type">form</field>
+</record>
+
+<record id = "view_cust_location_tree" model = "ir.ui.view">
+	<field name = "name">cutomer.location.tree</field>
+	<field name = "model">cust.location</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "typeCode"/>
+		<field name = "dispatchLocationInd"/>
+		<field name = "timezoneCd"/>
+		<field name = "locationAddress"/>
+		<field name = "geocodeAddress"/>
+		<field name = "regionHierarchy"/>
+	</tree>
+</field>
+</record>
+<!-- cust.location form view-->
+<record id = "view_cust_location_form" model = "ir.ui.view">
+	<field name = "name">cutomer.location.form</field>
+	<field name = "model">cust.location</field>
+	<field name = "arch" type = "xml">
+	<form>
+		<group>	
+				<field name = "name"/>
+				<field name = "typeCode"/>
+				<field name = "dispatchLocationInd"/>
+				<field name = "timezoneCd"/>
+				<field name = "locationAddress"/>
+				<field name = "geocodeAddress"/>
+				<field name = "regionHierarchy"/>
+		</group>
+	</form>
+</field>
+</record>
+<!-- locationAddress tree view-->
+<record id = "view_cust_location_civic_address_tree" model = "ir.ui.view">
+	<field name = "name">cust.location.civic.address.tree</field>
+	<field name = "model">cust.location.civic.address</field>
+	<field name = "arch" type = "xml">
+	<tree editable="top" create="true" delete="false">	
+		<field name = "name"/>
+		<field name = "streetName"/>
+		<field name = "streetNamePostTypeCode"/>
+		<field name = "municipalityCode"/>
+		<field name = "provinceStateCode"/>
+		<field name = "countryCode"/>
+		<field name = "postalCode"/>
+	</tree>
+</field>
+</record>
+<!-- locationAddress form view-->
+<record id = "view_cust_location_civic_address_form" model = "ir.ui.view">
+	<field name = "name">cust.location.civic.address.form</field>
+	<field name = "model">cust.location.civic.address</field>
+	<field name = "arch" type = "xml">
+	<form>
+		<group>
+			<group>
+				<field name = "name" width = "50.0%"/>
+				<field name = "streetName" width = "50.0%"/>
+				<field name = "streetNamePostTypeCode" width = "50.0%"/>
+			</group>
+			<group>
+				<field name = "municipalityCode" width = "50.0%"/>
+				<field name = "provinceStateCode" width = "50.0%"/>
+				<field name = "countryCode" width = "50.0%"/>
+				<field name = "postalCode" width = "50.0%"/>
+			</group>
+		</group>
+	</form>
+</field>
+</record>
+<!-- geocodeAddress tree view-->
+<record id = "view_cust_location_geocode_address_tree" model = "ir.ui.view">
+	<field name = "name">cust.location.geocode.address.tree</field>
+	<field name = "model">cust.location.geocode.address</field>
+	<field name = "arch" type = "xml">
+	<tree editable="top" create="true" delete="false">	
+		<field name = "name"/>
+		<field name = "latitude"/>
+		<field name = "longitude"/>
+		<field name = "parent_location" invisible="1"/>
+	</tree>
+</field>
+</record>
+<record id = "view_cust_location_geocode_address_form" model = "ir.ui.view">
+	<field name = "name">cust.location.geocode.address.form</field>
+	<field name = "model">cust.location.geocode.address</field>
+	<field name = "arch" type = "xml">
+	<form>
+		<group>	
+			<field name = "name"/>
+			<field name = "latitude"/>
+			<field name = "longitude"/>
+			<field name = "parent_location" invisible="1"/>
+		</group>
+	</form>
+</field>
+</record>
+
+<!-- regionHierarchy tree view-->
+<record id = "view_cust_location_region_hierarchy_tree" model = "ir.ui.view">
+	<field name = "name">cust.location.region.hierarchy.tree</field>
+	<field name = "model">cust.location.region.hierarchy</field>
+	<field name = "arch" type = "xml">
+	<tree editable="top" create="true" delete="false">	
+		<field name = "name"/>
+		<field name = "provinceName"/>
+		<field name = "provinceLocationId"/>
+		<field name = "regionName"/>
+		<field name = "regionLocationId"/>
+		<field name = "districtName"/>
+		<field name = "districtLocationId"/>
+		<field name = "serviceAreaName"/>
+		<field name = "serviceAreaCLLICd"/>
+		<field name = "serviceAreaLocationId"/>
+	</tree>
+</field>
+</record>
+<!-- regionHierarchy form view-->
+<record id = "view_cust_location_region_hierarchy_form" model = "ir.ui.view">
+	<field name = "name">cust.location.region.hierarchy.form</field>
+	<field name = "model">cust.location.region.hierarchy</field>
+	<field name = "arch" type = "xml">
+	<form>
+		<group>
+			<group>
+				<field name = "name" width = "50.0%"/>
+				<field name = "provinceName" width = "50.0%"/>
+				<field name = "provinceLocationId" width = "50.0%"/>
+				<field name = "regionName" width = "50.0%"/>
+				<field name = "regionLocationId" width = "50.0%"/>
+			</group>
+			<group>
+				<field name = "districtName" width = "50.0%"/>
+				<field name = "districtLocationId" width = "50.0%"/>
+				<field name = "serviceAreaName" width = "50.0%"/>
+				<field name = "serviceAreaCLLICd" width = "50.0%"/>
+				<field name = "serviceAreaLocationId" width = "50.0%"/>
+			</group>
+		</group>
+	</form>
+</field>
+</record>
+
+<record id = "view_project_type_form" model = "ir.ui.view">
+	<field name = "name">project.types.form</field>
+	<field name = "model">project.type</field>
+	<field name = "arch" type = "xml">
+	<form>
+		<group>	
+			<field name = "name" string="Project Type"/>
+			<field name = "desc" string="Description"/>
+		</group>
+		</form>
+</field>
+</record>
+<record id = "view_project_type_tree" model = "ir.ui.view">
+	<field name = "name">project.type.tree</field>
+	<field name = "model">project.type</field>
+	<field name = "arch" type = "xml">
+	<tree>	
+		<field name = "name"/>
+		<field name = "desc"/>
+	</tree>
+</field>
+</record>
+<record id="action_project_type" model="ir.actions.act_window">
+    <field name="name">Project Type</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.type</field>
+    <field name="view_type">form</field>
+</record>
+
+<!-- Data Source -->
+<record id = "view_data_source_form" model = "ir.ui.view">
+ <field name = "name">data.source.form</field>
+ <field name = "model">data.source</field>
+ <field name = "arch" type = "xml">
+ <form>
+  <group> 
+   <field name = "name" string="Data Source"/>
+   <field name = "desc" string="Description"/>
+  </group>
+  </form>
+</field>
+</record>
+<record id = "view_data_source_tree" model = "ir.ui.view">
+ <field name = "name">data.source.tree</field>
+ <field name = "model">data.source</field>
+ <field name = "arch" type = "xml">
+ <tree> 
+  <field name = "name"/>
+  <field name = "desc"/>
+ </tree>
+</field>
+</record>
+<record id="action_data_source" model="ir.actions.act_window">
+    <field name="name">Data Source</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">data.source</field>
+    <field name="view_type">form</field>
+</record>
+<!-- Modified Data Source -->
+<record id="action_modify_data_source" model="ir.actions.act_window">
+    <field name="name">Modified Data Source</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">modify.data.source</field>
+    <field name="view_type">form</field>
+</record>
+<!-- Modified Data Source -->
+<record id="action_priorityCd" model="ir.actions.act_window">
+    <field name="name">Priority</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.priority</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_priorityCd" model="ir.actions.act_window">
+    <field name="name">Priority</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.priority</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_safety" model="ir.actions.act_window">
+    <field name="name">Flag Disposition Safety</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">safety.safety</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_facilities" model="ir.actions.act_window">
+    <field name="name">Flag Disposition Facility</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">facilities.facilities</field>
+    <field name="view_type">form</field>
+</record>
+<record id="action_issue_processes" model="ir.actions.act_window">
+    <field name="name">Flag Disposition Process</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">processes.processes</field>
+    <field name="view_type">form</field>
+</record>
+<record id="event_import_project_action" model="ir.actions.client">
+    <field name="name">Import Project</field>
+    <field name="tag">import</field>
+    <field name="params" eval="{'model': 'project.project'}"/>
+</record>
+<record id="event_import_employee_action" model="ir.actions.client">
+    <field name="name">Import Employees</field>
+    <field name="tag">import</field>
+    <field name="params" eval="{'model': 'hr.employee'}"/>
+</record>
+<record id="event_import_client_action" model="ir.actions.client">
+    <field name="name">Import Clients</field>
+    <field name="tag">import</field>
+    <field name="params" eval="{'model': 'res.partner'}"/>
+</record>
+<record id="event_import_vender_action" model="ir.actions.client">
+    <field name="name">Import Venders</field>
+    <field name="tag">import</field>
+    <field name="params" eval="{'model': 'res.partner'}"/>
+</record>
+<record id="event_import_asset_action" model="ir.actions.client">
+    <field name="name">Import Assets</field>
+    <field name="tag">import</field>
+    <field name="params" eval="{'model': 'asset.asset'}"/>
+</record>
+<record id="action_project_work_location" model="ir.actions.act_window">
+    <field name="name">Work Location</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.work.location</field>
+    <field name="view_type">form</field>
+</record>
+<record id="company_normal_action_tree" model="ir.actions.act_window">
+    <field name="name">Companies</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.company</field>
+    <field name="view_type">form</field>
+    <field name="view_mode">kanban,tree,form</field>
+    <field name="domain">[('id','=',active_id)]</field>
+</record>
+<record id = "view_work_location_form" model = "ir.ui.view">
+	<field name = "name">work.location.form</field>
+	<field name = "model">project.work.location</field>
+	<field name = "arch" type = "xml">
+	<form>
+		<group>	
+			<label for="street" string="Address"/>
+			<div name="div_address">
+				<field name="name" placeholder="Street..."/>
+				<field name="street2"/>
+				<div class="address_format">
+					<field name="city" placeholder="City" style="width: 40%%"/>
+					<field name="state_id" class="oe_no_button" placeholder="Province" style="width: 37%%" options='{"no_open": True}' on_change="onchange_state(state_id)"/>
+					<field name="postal" placeholder="Postal Code" style="width: 20%%"/>
+				</div>
+				<field name="country_id" placeholder="Country" class="oe_no_button" options='{"no_open": True, "no_create": True}'/>
+			</div>
+		</group>
+		<group>
+			<field name = "description"/>
+		</group>
+	</form>
+	</field>
+</record>
+<record id = "view_work_location_tree" model = "ir.ui.view">
+	<field name = "name">work.location.tree</field>
+	<field name = "model">project.work.location</field>
+	<field name = "arch" type = "xml">
+		<tree>
+			<field name="name" string= "Street"/>
+			<field name="street2" string= "Street 2"/>
+			<field name="city" string= "City"/>
+			<field name="state_id" string= "Province"/>
+			<field name="postal" string= "Postal Code"/>
+			<field name="country_id" string= "Country"/>
+			<!--<field name = "description" string= "Description"/>-->
+		</tree>
+	</field>
+</record>
+
+
+<record id="action_expense_type" model="ir.actions.act_window">
+    <field name="name">Expense Type</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">expense.type</field>
+	<field name="limit">80</field>
+    <field name="view_type">form</field>
+</record>
+
+<record id="action_project_project_2_project_task_all" model="ir.actions.act_window">
+    <field name="name">Workload</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">project.task</field>
+    <field name="view_mode">calendar,tree,kanban,form,graph</field>
+</record>
+
+<record id = "view_asset_requisition_lines_form" model = "ir.ui.view">
+	<field name = "name">asset.requisition.lines.form</field>
+	<field name = "model">asset.requisition.lines</field>
+	<field name = "arch" type = "xml">
+		<form>
+			<group>
+				<field name="reserved_by"/>
+				<field name="date_requisted" string = "Required Date" />
+				<field name="name" string = "Asset Name"/>
+				<field name="asset_tag" string = "Asset Type"/>
+				<field name="notes" string="Notes"/>
+				<field name="pickup_location" string="PickUp Location"/>
+				<field name="approved_by"/>
+				<field name="state" string = "Status" invisible = "1"/><!--for status field-->
+			</group>
+		</form>
+	</field>
+</record>
+<record id = "view_asset_requisition_lines_form" model = "ir.ui.view">
+	<field name = "name">asset.requisition.lines.form</field>
+	<field name = "model">asset.requisition.lines</field>
+	<field name = "arch" type = "xml">
+		<form>
+			<group>
+				<field name="reserved_by"/>
+				<field name="date_requisted" string = "Required Date" />
+				<field name="name" string = "Asset Name"/>
+				<field name="asset_tag" string = "Asset Type"/>
+				<field name="notes" string="Notes"/>
+				<field name="pickup_location" string="PickUp Location"/>
+				<field name="approved_by"/>
+				<field name="state" string = "Status" invisible = "1"/><!--for status field-->
+			</group>
+		</form>
+	</field>
+</record>
+	<record id = "view_project_workorder_form" model = "ir.ui.view">
+	<field name = "name">project.workorder.form</field>
+	<field name = "model">project.workorder</field>
+	<field name = "arch" type = "xml">
+		<form>
+		<notebook>
+			<page string = "Assignment">
+				<group>
+						<field width = "50%" name="job_created_version" string="Version #"/>
+						<field width = "50%" name="job_created_date" string="Received Date"/>
+				</group>
+			</page>
+			<page string = "General">
+				<group>
+					<field width = "50%" name="originating_systemid"  />
+					<field width = "50%" name="originating_systemwork_order_groupid"  />
+					<field width = "50%" name="originating_systemwork_orderid"  />
+					<field width = "50%" name="originating_system_work_order_internalid"  />
+				</group>
+			</page>
+			<page string = "Job Details">
+					<group>
+						<field width = "50%" name="work_orderid"  />
+						<!-- <field width = "50%" name="originating_system_workorder_extension"  /> -->
+						<!-- <field width = "50%" name="secondary_systemid"  /> -->
+						<!-- <field width = "50%" name="secondary_system_work_orderid"  /> -->
+						<!-- <field width = "50%" name="secondary_system_work_order_internalid"  /> -->										
+						<field width = "50%" name="estimated_duration_num"  />
+						<field width = "50%" name="estimated_duration_unitcd"  />
+						<field width = "50%" name="originating_system_work_order_createdate"  />
+						<field width = "50%" name="work_order_attribute_list"  />
+						<field width = "50%" name="work_order_detail_ist"  />										
+						<field width = "50%" name="jobTypeCd"  />
+						<field width = "50%" name="productCategoryCd"  />
+						<field width = "50%" name="productTechnologyCd"  />
+						<field width = "50%" name="externalJobGroupingId"  />
+						<field width = "50%" name="partnerAcknowledgeStatusCd"  />
+						<field width = "50%" name="partnerAcknowlegeStatusDateTime"  />
+						<field width = "50%" name="outofServiceInd"  />
+						<field width = "50%" name="priorityCd"  />
+						<!-- <field width = "50%" name="workGroupCd"  /> -->
+						<field width = "50%" name="workforceSegmentCd"  />
+						<field width = "50%" name="externalJobId"  />
+						<field width = "50%" name="serviceIdentification"  />
+						<field width = "50%" name="classificationCd"  />										
+						<field width = "50%" name="customer_type_cd"  />
+						<field width = "50%" name="market_segment_cd"  />
+					</group>
+			
+			</page>
+			<page string = "Customer">
+				<group string="Service Address">
+					<field width = "50%" name="location"  />
+				</group>		
+				<group string="Customer Detail">
+					<field width = "50%" name="customer_name"/>
+					<field width = "50%" name="customer_legal_name"/>
+					<field width = "50%" name="customer_rating_cd"  />			
+				</group>		
+			</page>
+			<page string = "Remarks">
+				<group>
+					<field width = "50%" name="accept_remark" string="Accept Remarks"/>
+					<field width = "50%" name="enroute_remark" string="En-Route Remarks"/>
+					<field width = "50%" name="onsite_remark" string="On-Site Remarks"/>
+					<field width = "50%" name="incomplete_remark" string="In Complete Remarks"/>
+					<field width = "50%" name="reject_remark" string="Reject Remarks"/>
+				</group>
+			</page>
+			<page string = "Time">
+				<group string="Time">
+					<field width = "50%" name="work_order_appointment_start_date"  />
+					<field width = "50%" name="work_order_appointment_end_date"  />
+					<!-- <field width = "50%" name="work_order_early_startdate"  /> -->
+					<field width = "50%" name="work_order_duedate"  />
+				</group>		
+			</page>
+			<page string = "Status Detail">
+				<group>
+					<field width = "50%" name="rejected_time_stamp" string="Rejected Time Stamp"/>
+					<field width = "50%" name="rejected_reason" string="Rejected Reason"/>
+					<field width = "50%" name="rejected_by" string="Rejected By"/>
+					<field width = "50%" name="accepted_time_stamp" string="Accepted Time Stamp"/>
+					<field width = "50%" name="en_route_time_stamp" string="En-Route Time Stamp"/>
+					<field width = "50%" name="onsite_time_stamp" string="On-Site Time Stamp"/>
+					<field width = "50%" name="complete_time_stamp" string="Complete Time Stamp"/>
+					<field width = "50%" name="incomplete_time_stamp" string="In-Complete Time Stamp"/>
+					<field width = "50%" name="incomplete_reason" string="In-Complete Reason"/>
+					<field width = "50%" name="cancelled_time_stamp" string="Cancelled Time Stamp"/>
+					<field width = "50%" name="restore_date_time" string="Restore Date Time"/>
+				</group>			
+			</page>
+			<!-- <page string = "Dispatch Address"></page> -->
+			<!-- <page string = "Site Location"></page> -->
+			<page string = "Contact">
+				<group string="Contact List">
+					<field width = "50%" name="customer_contact_list"  />
+				</group>		
+			</page>
+			<!-- <page string = "Requirements"></page> -->
+			<page string = "Administration">
+				<group>
+						<field width = "50%" name="serviceClassCd"  />
+						<field width = "50%" name="workOrderActionCd"  />
+				</group>			
+			</page>		
+		</notebook>
+		</form>
+	</field>
+</record>
+<!--Project tree inherited-->
+		<record model = "ir.ui.view" id = "project_tree_ihrt">
+			<field name = "name">project.tree.inhr</field>	
+			<field name = "model">project.project</field>
+			<field name = "inherit_id" ref = "project.view_project"/>
+			<field name = "arch" type = "xml">
+			<data>
+                <field name="sequence" widget="handle" position = "replace"/>
+                <field name="message_unread" invisible="1" position = "replace"/>
+                <field name="date" invisible="1" position = "replace"/>
+                <field name="name" string="Project Name" position = "replace"/>
+                <field name="user_id" string="Project Manager" position = "replace"/>
+                <field name="partner_id" string="Contact" position = "replace"/>
+                <field name="parent_id" string="Parent" invisible="1" position = "replace"/>
+                <field name="planned_hours" widget="float_time" position = "replace"/>
+                <field name="total_hours" widget="float_time" position = "replace"/>
+                <field name="effective_hours" widget="float_time" position = "replace"/>
+                <field name="progress_rate" widget="progressbar" position = "replace"/>
+                <field name="state" position = "replace"/>
+				<tree>
+					<field name="sequence" widget="handle"/>
+					<field name="message_unread" invisible="1"/>
+					<field name="name" string="Project Name"/>
+					<field name="partner_id" string="Client"/>
+					<field name="project_manager" string="Project Manager"/>
+					<field name="create_date"/>
+					<field name="date_start"/>
+					<field name="date" invisible="0" string="Due Date"/>
+					<field name="project_planned_hours" widget="float_time" string="Quoted Hours"/><!-- project_planned_hours -->
+					<field name="hours_charged" widget="float_time" string = "Hours Charged"/>
+					<field name="hours_budget_remain_kanban" widget="float_time" string = "Quoted Hours Remain"/>
+					<field name = "project_progress" widget = "progressbar" string="Completion Status"/>
+					<field name="state" string = "State"/>
+				<!-- <xpath expr = "//field[@name ='progress_rate']" position = "replace">
+				<field name = "project_progress" widget = "progressbar"/>
+				</xpath> -->
+				</tree>
+				
+			</data>
+			</field>
+
+
+		</record>
+<!--Project inherited-->
+
+		<record model="ir.ui.view" id="inherit_project_form">
+		      <field name="name">project.inherit</field>
+		      <field name="model">project.project</field>
+		      <field name="inherit_id" ref="project.edit_project"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+			  	<data>
+                 <!--make invisible start and end date from page other info-->
+			  	 <field name="date_start" position = "replace"/>
+                 <field name="date" position = "replace"/>
+                 <field name="planned_hours" position = "replace" />
+                 <field name="effective_hours"  position = "replace"/>
+                 <field name="user_id"  position = "replace"/>
+                 <field name="partner_id" position="replace"/>
+				 	
+				<div class="oe_title">
+					<label for="partner_id"  class="oe_edit_only" string="Client"/>
+					<h2><field name="partner_id" string = "Client" width = "33.0%" options="{'no_quick_create': 1, 'no_create_edit' : 1, 'no_create': 1, 'no_open': 1}" domain="[('is_company','=',1)]"/></h2>
+					<label for="project_types"  class="oe_edit_only" string="Project Type"/>
+					<field name="project_types" required="0" widget="many2many_tags"/>
+				</div>
+					<group>
+							<group>
+							</group>
+							<group width = "100%" col = "6"  name="g1mt">									
+								<!--<field name="project_types" string = "Project Type" width = "33.0%"/>-->
+								<group>
+									<field name="project_type_template" string = "Task Template" width = "33.0%" attrs="{'readonly':[('restrict_access','=',1)]}" options="{'no_quick_create': 1, 'no_create_edit' : 1, 'no_create': 1, 'no_open': True}"/>									
+									<field name = "date_start" string = "Start Date" width = "33.0%"/>
+									<field name="project_planned_hours" widget="float_time" string = "Quoted Hours" width = "33.0%" groups = "cni.group_cni_project_manager"/>
+									<field name="planned_expense" string = "Expenses Budget" widget='monetary' options="{'currency_field': 'company_currency_id'}" width = "33.0%" groups = "cni.group_cni_project_manager"/>									
+									<label for="alert_condition" attrs="{'invisible': [('alert_condition','!=','Jeopardy')]}"/>
+									<label string="Jeopardy" style="color: white; background-color: Red; font-weight: bold; padding: 4px 4.9em; border-radius: 14px; box-shadow: 0 24px 24px 0 rgba(0,0,0,0.2),0 40px 77px 0 rgba(0,0,0,0.22)!important;" attrs="{'invisible': [('alert_condition','=','Normal')]}"/>
+									<label for="alert_condition" attrs="{'invisible': [('alert_condition','!=','Normal')]}"/>
+									<label string="Normal" style="color: white; background-color: Green; font-weight: bold; padding: 4px 4.9em; border-radius: 14px; box-shadow: 0 24px 24px 0 rgba(0,0,0,0.2),0 40px 77px 0 rgba(0,0,0,0.22)!important;" attrs="{'invisible': [('alert_condition','=','Jeopardy')]}"/>
+									<field name="alert_condition" string = "Alert Condition" invisible ="1" readonly="1" />
+									<!-- box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)!important; //// LOW-->
+									<!-- box-shadow: 0 16px 24px 0 rgba(0,0,0,0.22),0 25px 55px 0 rgba(0,0,0,0.21)!important; //// MEDIUM-->
+									<!-- box-shadow: 0 24px 24px 0 rgba(0,0,0,0.2),0 40px 77px 0 rgba(0,0,0,0.22)!important; //// HIGH-->
+								</group>
+									
+								<group>
+									<field name="user_id" width = "33.0%" string="Project Manager" attrs="{'readonly':['|',('restrict_access','=',True),('state','in',['close', 'cancelled'])]}"/>
+									<field name="date" required = "0" string = "Due Date" width = "33.0%"/>
+									<field name="hours_charged" widget="float_time" string = "Hours Charged" width = "33.0%" groups = "cni.group_cni_project_manager"/>
+									<field name="expense_charged" string = "Expenses Charged" widget='monetary' options="{'currency_field': 'company_currency_id'}" width = "33.0%" groups = "cni.group_cni_project_manager"/>
+									<field name ="project_state_desc" string = "Alert Disposition" width = "33.0%" readonly="1"/>
+								</group>
+								
+								<group>
+									<field name = "quot_no" width = "33.0%" string = "Quote number"/>									
+									<field name="priorityCd" string = "Priority Level" width = "33.0%" options="{'no_quick_create': 1, 'no_create_edit' : 1, 'no_create': 1, 'no_open': 1}"/>									
+									<field name="hours_budget_remain" widget="float_time" string = "Quoted Hours Remain" width = "33.0%" groups = "cni.group_cni_project_manager"/>									
+									<field name="budget_remain" string = "Expense Budget Remain" widget='monetary' options="{'currency_field': 'company_currency_id'}" width = "33.0%" groups = "cni.group_cni_project_manager"/>
+									<field name ="project_progress" string = "Completion Status" widget = "progressbar" width = "33.0%" />
+									<field name ="project_progress" string = "Check progress"  width = "33.0%" />
+								</group>
+								<!--<field name="priority_setting_source" widget="radio" width = "33.0%"/>-->
+
+								<field name = "isinjeopardy" invisible ="1"/>
+								<field name = "members" invisible ="1"/>
+								<field name = "company_currency_id" invisible ="1"/>
+								<!--<field name="billing" string = "Billing" width = "33.0%"/>
+								<field name="work_location" string = "Work Location" width = "33.0%"/>-->
+
+							</group>
+							<br/>
+							<group col = "2"  name="g2mt"> 
+								<field name="available_clock_time" string = "Clock Time" widget="float_time" width = "33.0%"/>
+								<field name="work_location" string = "Work Location" options="{'no_quick_create': 1, 'no_create_edit' : 1, 'no_create': 1, 'no_open': 1}"/>								
+							</group>
+							<br/>
+							<group col = "2"  name="g2mt"> 
+								<label for="desc" class="" string="Project Description"/>	
+								<field name="desc" nolabel = "1"/>									
+							</group>			                
+			                <field name="restrict_access" invisible = "1"/>							
+					</group>
+					<notebook>					
+					<page string = "Contact Info">
+						<div align="center" >
+							<group width = "100%" col = "8" string = "Project Management Office Contact Information">
+							
+								<field width = "25.0%" name="prj_mgr_phone" readonly = "0" string = "Project Mgr Office #:"/>								
+								<field width = "25.0%" name="prj_mgr_ext" readonly = "0" string ="Ext:"/> 
+								<field width = "25.0%" name="prj_mgr_cell" readonly = "0" string ="CNI Project Mgr Cellular #:"/>                                                
+								<field width = "25.0%" name="prj_mgr_email" readonly = "0" string ="CNI Project Mgr e-mail:"/>
+																
+								<field width = "25.0%" name="client_phone" readonly = "1" string = "Client Dispatch Office #:"/>
+								<field width = "25.0%" name="client_ext" readonly = "1" string ="Ext:"/> 
+								<field width = "25.0%" name="client_contactlist"  readonly = "0" string ="Client Dispatch Name:" domain="[('parent_id','=',partner_id)]" />                                                
+								<field width = "25.0%" name="client_email" readonly = "1" string ="Client Dispatch e-mail:"/>
+																
+								<field width = "25.0%" name="client_phone_esclation" readonly = "1" string = "Client Escalation Office #:"/>
+								<field width = "25.0%" name="client_ext_esclation" readonly = "1" string ="Ext:"/> 
+								<field width = "25.0%" name="client_contactlist_esclation" domain="[('parent_id','=',partner_id)]" readonly = "0" string ="Client Escalation Name:"/>                                                
+								<field width = "25.0%" name="client_email_esclation" readonly = "1" string ="Client Escalation e-mail:"/>
+							</group>
+						</div>						
+						<hr/>						
+						<div align="center">
+							<group width = "100%" col = "8" string = "Client Customer Dispatch Details">
+								<field width = "25%" name="srv_cls_cs" string="Client Business Unit:" readonly="0"/> <!-- display service class cd from workorder object -->
+								<field width = "25%" name="customer_type_cd" string="Type:"  /><!-- display product_categorycd from work order -->
+								<field width = "25%" name="client_dispatchsec" string="Client Dispatch Sector:" readonly="0"/><!-- display serviceareaName from work order -->
+								<field width = "25%" name="custtimezone" string="Client Dispatch Time Zone:" readonly="0"/>  <!-- timezoneCd -->
+								
+								<field width = "25%" name="customer_name"/>
+								<field width = "25%" name="customer_type_cd" string="Type:" /> <!-- Waiting for client to explain -->
+								<field width = "25%" name="customer_legal_name"  />
+								<field width = "25%" name="customer_rating_cd"  />
+							</group>
+						</div>						
+						<hr/>						
+						<div align="center">
+							<group>
+								<div align="center">
+									<h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em;">Site Contact Information</h2>
+									<field  name="client_contacts_list" nolabel = "1" readonly="0">
+										<tree delete="true" create="false">
+											<field name="parent_project" invisible="1"/>								
+											<field name="subpartner_id" invisible="1"/>								
+											<field name="name"/>								
+											<field name="phoneNumberTxt"/>								
+											<field name="cellNumberTxt"/>								
+											<field name="emailTxt"/>								
+											<field name="address"/>								
+										</tree>
+									</field>
+								</div>
+								<div align="center">
+									<h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em;">Comments/Remarks</h2>
+									<field name="client_contacts_list_txt" nolabel = "1" placeholder="Comments/Remarks"/>
+								</div>
+							</group>
+						</div>
+					</page>
+					<page string = "Project Plan">
+						<field name="project_tasks_work" widget="one2many_list">
+							<tree delete="false" editable ="true" create="false">
+								<field name="date_start" string="Start Date" />
+								<field name="task_id" string="Project/Milestone" readonly="1" />
+								<field name="name" string = "Task/Site" readonly="1" />
+								<field name="image"  widget="image" height="25px" display="thumbnail"/>
+								<field name="user_id" string="Done By" /> <!-- Assigned Technician -->
+								<field name="activity_time" widget="float_time" string="Budget Hours" sum="Budget Hours" groups = "cni.group_cni_project_manager"/>
+								<field name="task_due_date" string="Due Date" />
+								<field name="hours" widget="float_time" string="Charged Hours" sum="Charged Hours" groups = "cni.group_cni_project_manager"/>
+								<field name="task_state" string="Status" readonly="1"/>
+								<field name="task_progress" string="Progress" widget="progressbar" readonly="1" />
+							</tree>
+							<!-- <form groups = "cni.group_cni_project_manager">
+								<field name="task_id" string="Project/Milestone" readonly="1" domain="[('project_id', '=',project_id)]"/>
+								<field name="name" string = "Task/Site" readonly="1" domain="[('task_id', '=',task_id)]"/>
+								<field name="user_id" string="Assigned Technician" />
+								<field name="activity_time" widget="float_time" string="Budget Hours" />
+								<field name="hours" widget="float_time" string="Charged Hours" />
+								<field name="project_id" string ="Project" invisible="1"/>
+							</form> -->
+						</field>
+
+					</page>	
+                <page string = "Work Order">
+				<div align="center">
+                    <group  width = "100%" col = "8" string = "Project Work Order Creation Detail">
+					
+                        <field width = "25.0%" name="create_date" string = "Project Create Date" readonly="1"/>
+                        <field width = "25.0%" name="create_uid" string ="Created By" readonly="1"/> 
+                        <field width = "25.0%" name="data_sources" widget="many2many_tags" string ="Data Source"/>       
+                        <field width = "25.0%" name="create_user_phone" string ="Contact #" readonly = "1"/> 
+                        <field width = "25.0%" name="modified_date"  string = "Last Modified Date" readonly="1"/>
+                        <field width = "25.0%" name="modifier"  string ="Modified By" readonly="1"/>
+                        <field width = "25.0%" name="modify_data_sources" widget="many2many_tags" string ="Data Source"/> 
+                        <field width = "25.0%" name="write_user_phone" string ="Contact #" readonly = "1"/> 
+						
+                    </group>
+				</div>
+				<div readonly="1" align="center" style="overflow-y: scroll;">
+                    <group  width = "100%" col = "8"  string = "Attached Work Order Documents">
+                    		<!--<field name="partner_id" invisible = "1"/>-->  
+                        <field name="attached_docs" nolabel = "1" widget="one2many_list" >
+							<tree>
+								<field name="create_date" string = "Create Date"/>
+								<field name="name" string ="Document File Name"  />
+								<field name="datas" filename="datas_fname" string ="Download/Size"/>
+                                <field name="contact" string = "Source/Author Name"/>
+                                
+								<field name="company_id" invisible = "1"/>                                
+                                <field name="write_date" invisible = "1" groups="base.group_no_one"/>
+                                <field name="type" invisible = "1"/>
+								
+                                <field name="user_email" string="Email"/>
+                                <field name="user_phone" string="Office Tel"/>
+                                <field name="user_cellno" string="Cellullar"/>
+							</tree>
+                        </field>
+                    </group>
+				</div>
+				<div align="center" style="overflow-y: scroll;">
+                    <group  width = "100%" col = "8" string = "PubSub Work Order Data Detail">
+                            <field name="project_work_order_ids" nolabel = "1" widget="one2many_list">
+                        <tree>
+								<field width = "50%" name="job_created_version" string="##"/>
+								<field width = "50%" name="job_created_date" string="Received Date"/>
+								<field width = "50%" name="work_orderid"  />
+								<field width = "50%" name="originating_systemid"  />
+								<field width = "50%" name="originating_systemwork_order_groupid"  />
+								<field width = "50%" name="originating_systemwork_orderid"  />
+								<field width = "50%" name="originating_system_work_order_internalid"  />
+								<field width = "50%" name="originating_system_workorder_extension"  />
+								<field width = "50%" name="secondary_systemid"  />
+								<field width = "50%" name="secondary_system_work_orderid"  />
+								<field width = "50%" name="secondary_system_work_order_internalid"  />
+								
+								<field width = "50%" name="work_order_appointment_start_date"  />
+								<field width = "50%" name="work_order_appointment_end_date"  />
+								<field width = "50%" name="work_order_early_startdate"  />
+								<field width = "50%" name="work_order_duedate"  />
+								<field width = "50%" name="estimated_duration_num"  />
+								<field width = "50%" name="estimated_duration_unitcd"  />
+								<field width = "50%" name="originating_system_work_order_createdate"  />
+								<field width = "50%" name="work_order_attribute_list"  />
+								<field width = "50%" name="work_order_detail_ist"  />
+								
+								<field width = "50%" name="jobTypeCd"  />
+								<field width = "50%" name="productCategoryCd"  />
+								<field width = "50%" name="productTechnologyCd"  />
+								<field width = "50%" name="externalJobGroupingId"  />
+								<field width = "50%" name="workOrderActionCd"  />
+								<field width = "50%" name="partnerAcknowledgeStatusCd"  />
+								<field width = "50%" name="partnerAcknowlegeStatusDateTime"  />
+
+								<field width = "50%" name="outofServiceInd"  />
+								<field width = "50%" name="priorityCd"  />
+								<field width = "50%" name="serviceClassCd"  />
+								<field width = "50%" name="workGroupCd"  />
+								<field width = "50%" name="workforceSegmentCd"  />
+								<field width = "50%" name="externalJobId"  />
+								<field width = "50%" name="serviceIdentification"  />
+								<field width = "50%" name="classificationCd"  />
+								
+								<field width = "50%" name="customer_name"/>
+								<field width = "50%" name="customer_legal_name"/>
+								<field width = "50%" name="customer_rating_cd"  />
+								<field width = "50%" name="customer_type_cd"  />
+								<field width = "50%" name="market_segment_cd"  />
+								<field width = "50%" name="serviceClassCd"  />
+								<field width = "50%" name="location"  />
+                        </tree>
+                        </field>
+                    </group>
+					</div>
+					
+
+                </page>
+				<page string = "Material" readonly = "1">
+					<field name="consumeable_items" readonly="1" widget="one2many_list">
+							<tree >
+								<field name="image"  widget="image" height="25px" display="thumbnail"/>                                                                                  
+								<field name="date_dispatched" string = "Required Date"/>
+								<field name="dispatch_qty" string = "Quantity"  attrs="{'readonly':[('state','!=','Draft')]}" />
+								<field name="sku" readonly ="1"/>
+								<field name="project_id" invisible ="1"/>
+								<field name="total" invisible ="1"/>
+								<field name="client_ref" string="Client Ref #" readonly ="1"/>
+								<field name="name" on_change="onchange_product(name)"  string = "Product Name" attrs="{'readonly':[('state','!=','Draft')]}"  />
+								<field name="prod_desc"/>
+								<field name="source" string = "Source"/>
+								<field name="pickup_location" string="PickUp Location"/>
+								<field name="state" readonly = "1"/>
+								<field name="notes"/>
+							</tree>
+					</field>
+					<button name="request_project_consumable_material" class="oe_edit_only" string="Request Material" type="object"/>
+			    </page>
+				<page string = "Stockables" invisible = "1">
+					<field name="stockable" readonly="1"/>
+			    </page>
+				<page string = "Reserved Eq." readonly="1">
+					<field name="reservation_lines" readonly="1" widget="one2many_list">
+					<tree>
+						<field name="image"  widget="image" height="25px" display="thumbnail"/>
+						<field name="name" string = "Asset Name" />
+						<field name="asset_tag" string="Asset Type"/>
+						<field name="date_requisted" string = "Required Date" />
+						<field name="reserved_by" />
+						<field name="approved_by" />
+						<field name="pickup_location" />
+						<field name="state" string = "Status" /><!--for status field-->
+						<field name="notes" />
+						</tree>
+					</field>
+					<button name="request_project_tools" class="oe_edit_only" string="Request Tool" type="object"/>
+			    </page>	
+					<page string = "Status History" invisible = "1">
+                    <field name="project_closing_logs" readonly = "1" nolabel = "1"  />
+                    </page>
+					<page string = "History">
+                    <field name="project_transactional_logs" readonly = "1" nolabel = "1"  />
+                    </page>
+					<!--<page string = "Expenses" groups = "cni.group_cni_project_manager"> --> 
+					<page string = "Expenses" groups = "cni.group_cni_project_manager">                    
+						<field name="project_expenses" readonly="1" widget="one2many_list" nolabel="1">
+							<tree>
+								<field name="expdate" string="Date"/>
+								<field name="expensed_by" string="Incurred By"/>
+								<field name="desc" string="Expense Description"/>
+								<field name="flight" string="Flight($)" sum="$" />
+								<field name="hotel" string="Hotel($)" sum="$" />
+								<field name="meals" string="Meals($)" sum="$" />
+								<field name="transport" string="Transport($)" sum="$" />
+								<field name="telecom" string="Telecom($)" sum="$" />
+								<field name="material" string="Material($)" sum="$" />
+								<field name="tools" string="Tools($)" sum="$" />
+								<field name="fleet" string="Fleet($)" sum="$" />
+								<field name="parking" string="Parking($)" sum="$" />
+								<field name="misc" string="Misc($)" sum="$" />
+								<field name="taxes" string="Taxes($)" sum="$" />
+								<field name="total" string="Total Charge($)" sum="$"/>
+							</tree>
+							<form>
+								<group  width = "100%" col = "6" string = "Expense By">
+									<field name="expdate" string="Date"/>
+									<field name="expensed_by" string="Incurred By"/>
+									<field name="desc" string="Expense Description"/>
+								</group>
+								<group  width = "100%" col = "6" string = "Expense Detail">
+									<field name="flight" string="Flight"/>
+									<field name="hotel" string="Hotel"/>
+									<field name="meals" string="Meals"/>
+									<field name="transport" string="Transport"/>
+									
+									<field name="telecom" string="Telecom"/>
+									<field name="material" string="Material"/>
+									<field name="tools" string="Tools"/>
+									<field name="fleet" string="Fleet"/>
+									
+									<field name="parking" string="Parking"/>
+									<field name="misc" string="Misc"/>
+									<field name="taxes" string="Taxes"/>
+									
+									<field name="expense_id" invisible="1"/>
+									<field name="project_id" invisible="1"/>
+								</group>
+								<group  width = "100%" col = "2" string = "Total Expense">
+									<field name="total"/>
+								</group>
+							</form>
+							</field>	
+						<button name="request_project_expense" class="oe_edit_only" string="Add Expense" type="object"/>
+					</page>
+					<page string = "Billing" groups = "cni.group_cni_project_manager">
+					<div>
+						<div align="center" style="overflow-y: scroll;">
+						<group  width = "100%" col = "8" string = "Project Invoicing Summary">							
+							<field name="invoice_ids" readonly="0" widget="one2many_list" nolabel="1">
+								<tree editable="top">
+									<field name="name" string="PO/Client Reference No" />
+									<field name="invoice_no" string="Invoice #" />
+									<field name="inv_prepared_by" string="Prepared By" />
+									<field name="inv_approved_by" string="Approved By" />
+									<field name="inv_date" string="Date" />
+									<field name="inv_amount" string="Amount" sum="$"/>
+									<field name="inv_issue_date" string="Issue Date" />
+									<field name="inv_due_date" string="Due Date" />
+									<field name="inv_remit_date" string="Remit Date" />
+									<field name="inv_days" string="Days" />
+									<field name="inv_notes" string="Notes" />
+								</tree>
+								<form>
+									<group  width = "100%" col = "4" string = "Project Invoicing Summary">
+										<field name="name" string="PO/Client Reference No" />
+										<field name="invoice_no" string="Invoice #" />
+										<field name="inv_prepared_by" string="Prepared By" />
+										<field name="inv_approved_by" string="Approved By" />
+										<field name="inv_date" string="Date" />
+										<field name="inv_amount" string="Amount" />
+										<field name="inv_issue_date" string="Issue Date" />
+										<field name="inv_due_date" string="Due Date" />
+										<field name="inv_remit_date" string="Remit Date" />
+										<field name="inv_days" string="Days" />
+										<field name="inv_notes" string="Notes" />
+									</group>
+								</form>
+							</field>						
+						</group>
+						</div>
+						<div align="center" style="overflow-y: scroll;">						
+							<h2 style="color:#7C7BAD; margin-top: 0.6em;" >Project Billing Details</h2>
+							<h3 align="left" style="color:#0e5680;">Time</h3>
+							<group  width = "100%" col = "8">
+								<field name="tasks" readonly="0" widget="one2many_list" nolabel="1">
+									<tree delete="false" create="false" editable ="top">
+									<field name="date_start" string="Date" />
+									<field name="project_id" string="P/O Client Reference #" />
+									<field name="name" string="Billable Unit" />
+									<field name="quantity" sum="$"/>
+									<field name="hour_rate" string="Rate ($)" />
+									<field name="gross_bill" string="Gross Billable ($)" sum="$"/>
+									<field name="adjustments" string="Adjustments ($)" sum="$"/>
+									<field name="taxes" string="Taxes ($)" sum="$"/>
+									<field name="net_bill" string="Net Billable ($)" sum="$"/>
+									<field name="comments" />
+									</tree>
+									<form>
+									<label for="date_start"/>
+									<field name="date_start" string="Date" />
+									<label for="project_id"/><field name="project_id" string="P/O Client Reference #" />
+									<label for="name"/><field name="name" string="Billable Unit" />
+									<label for="quantity"/><field name="quantity" />
+									<label for="hour_rate"/><field name="hour_rate" />
+									<label for="gross_bill"/><field name="gross_bill" />
+									<label for="adjustments"/><field name="adjustments" />
+									<label for="project_id"/><field name="taxes" />
+									<label for="net_bill"/><field name="net_bill" />
+									<label for="comments"/><field name="comments" />
+									</form>
+							  </field>						
+							</group>
+						</div>
+						<div align="center" style="overflow-y: scroll;">
+						<h3 align="left" style="color:#0e5680;">Materials</h3>
+						<group  width = "100%" col = "8">							
+							<field name="project_billing_material" widget="one2many_list" nolabel="1">
+								<tree delete="false" create="false" editable="top">
+									<field name="date_dispatched" string="Date" />
+									<field name="project_id" string="P/O Client Reference #" />
+									<field name="name" string="Billable Unit" />
+									<field name="dispatch_qty" sum="$"/>
+									<field name="sale_price" string="Rate ($)"/>
+									<field name="total" string="Gross Billable ($)" sum="$"/>
+									<field name="adjustments" string="Adjustments ($)" sum="$"/>
+									<field name="taxes" string="Taxes ($)" sum="$"/>
+									<field name="net_bill" string="Net Billable ($)" sum="$"/>
+									<field name="notes" string="Comments"/>
+								</tree>
+							</field>
+						</group>
+						</div>
+						<div align="center" style="overflow-y: scroll;">
+						<h3 align="left" style="color:#0e5680;">Expenses</h3>
+						<group  width = "100%" col = "8">							
+							<field name="project_expenses_lines2" readonly="0" widget="one2many_list" nolabel="1">
+								<tree delete="false" create="false" editable="top">
+									<field name="dated" string="Date" />
+									<field name="project_id" string="P/O Client Reference #" />
+									<field name="billable_unit" string="Billable Unit" />
+									<field name="quantity" sum="$"/>
+									<field name="amount" string="Rate ($)"/>
+									<field name="gross_bill" string="Gross Billable ($)" sum="$"/>
+									<field name="adjustments" string="Adjustments ($)" sum="$"/>
+									<field name="taxes" string="Taxes ($)" sum="$"/>
+									<field name="net_bill" string="Net Billable ($)" sum="$"/>
+									<field name="comments" />
+								</tree>									
+							</field>						
+						</group>
+						</div>
+					</div>
+					
+					</page>
+					<page string = "Metrics" groups = "cni.group_cni_project_manager">
+						<div align="center" >
+							<group width = "100%" col = "8" string = "Corporate Loading and Ratios">
+								<field width = "25.0%" name="met_average_tech_labour_rate" readonly = "0" string = "Average tech labour rate ($)"/>								
+								<field width = "25.0%" name="met_wsib_ei_overheads" readonly = "0" string ="WSIB and EI Overheads (%)"/> 
+								<field width = "25.0%" name="met_average_truck_roll_cost_km" readonly = "0"/> 
+								
+								<field width = "25.0%" name="met_group_benefits_loadings_rate" readonly = "0" string ="Group Benefits loadings rate (%)"/>							
+								<field width = "25.0%" name="met_non_productive_loadings" readonly = "0" string = "Non-productive loadings (%)"/>
+								<field width = "25.0%" name="met_management_overheads" readonly = "0" string ="Management Overheads (%)"/>
+								
+								<field width = "25.0%" name="met_insurance_taxes"  readonly = "0" string ="Insurance and Taxes (%)"/>                                                
+								<field width = "25.0%" name="met_fixed_overheads_loadings" readonly = "0" string ="Fixed overheads loadings (%)"/>
+								<field width = "25.0%" name="met_dynamic_overheads_loadings" readonly = "0" string = "Dynamic overheads loadings (%)"/>
+								
+								<field width = "25.0%" name="met_shareholder_privilege" readonly = "0" string = "Shareholder Privilege (%)"/>								
+							</group>
+						</div>
+					<div align="center" style="overflow-y: scroll;">
+						<div align="center">
+							<group>
+								<div align="center">
+									<h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em; margin-top: 0.6em;">Metrics Summary</h2>
+									
+									<!-- This tree is Displaying REVENUES/COSTS/MARGIN-->
+									
+									<field  name="project_pl_display_summary_ids" nolabel = "1">
+										<tree delete="false" create="false" limit="1" editable = "1">
+											<field name="name" string = "Project ID" invisible="1"/>								
+											<field name="pl_summary" fonts="bold"/>								
+											<field name="pl_start_date" string = "Start Date"/>								
+											<field name="pl_end_date" string = "End Date"/>								
+											<field name="pl_due_date" string = "Due Date"/>								
+											<field name="pl_target" string = "Target"/>		
+											<field name="pl_actual" string = "Actual" />	
+											<field name="pl_difference" string = "Difference" />
+											<field name="pl_percentage" string = "%" />	
+											<field name="pl_metric" string = "Metric"/>
+											<field name="pl_rate" string = "Rate" />								
+										</tree>
+									</field>
+									<!-- TOTAL PROJECT REVENUES -->
+									<field  name="pl_summary_revenue_ids" invisible = "1" nolabel = "1">
+										<tree delete="false" create="false" limit="1" editable = "1">
+											<field name="name" string = "Project ID" invisible="1"/>								
+											<field name="pl_summary" style="font-weight: bold;" />								
+											<field name="pl_start_date" string = "Start Date"/>								
+											<field name="pl_end_date" string = "End Date"/>								
+											<field name="pl_due_date" string = "Due Date"/>								
+											<field name="pl_target" string = "Target"/>		
+											<field name="pl_actual" string = "Actual" />	
+											<field name="pl_difference" string = "Difference" />
+											<field name="pl_percentage" string = "%" />	
+											<field name="pl_metric" string = "Metric"/>
+											<field name="pl_rate" string = "Rate" />								
+										</tree>
+									</field>
+									<!-- TOTAL PROJECT COSTS -->
+									<field  name="pl_summary_cost_ids" invisible = "1" nolabel = "1">
+										<tree delete="false" create="false" limit="1" editable = "1">
+											<field name="name" string = "Project ID" invisible="1"/>								
+											<field name="pl_summary" nolabel = "1"/>								
+											<field name="pl_start_date" nolabel = "1" string = "Start Date"/>								
+											<field name="pl_end_date" nolabel = "1" string = "End Date"/>								
+											<field name="pl_due_date" nolabel = "1" string = "Due Date"/>								
+											<field name="pl_target"  on_change="onchange_costtarget(pl_target,name)"  nolabel = "1" string = "Target"/>		
+											<field name="pl_actual" nolabel = "1" string = "Actual" />	
+											<field name="pl_difference" nolabel = "1" string = "Difference" />
+											<field name="pl_percentage" nolabel = "1" string = "%" />	
+											<field name="pl_metric" nolabel = "1" string = "Metric"/>
+											<field name="pl_rate" nolabel = "1" string = "Rate" />								
+										</tree>
+									</field>
+									<!-- NET PROJECT MARGIN -->
+									<field  name="net_project_margins_ids" invisible = "1" nolabel = "1">
+										<tree nolabel = "1" delete="false" create="false" limit="1" editable = "1">
+											<field name="project_id" string = "Project ID" invisible="1"/>								
+											<field name="name"   string = "Name"/>	
+											<field name="pl_target"   string = "Target"/>		
+											<field name="pl_actual"  string = "Actual" />	
+											<field name="pl_difference"  string = "Difference" />
+											<field name="pl_percentage"  string = "%" />	
+											<field name="pl_metric"  string = "Metric"/>
+											<field name="pl_rate"  string = "Rate" />								
+										</tree>
+									</field>
+									<!-- <h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em; margin-top: 0.6em;">Labour Hours Expended</h2> -->
+									<field  name="labour_hours_expended_ids" nolabel = "1" readonly="0">
+										<tree delete="false" create="false">
+											<field name="name" string = "Project ID" invisible="1"/>								
+											<field name="labour_hours_expended" string = "Labour Hours Expended"/>								
+											<field name="labour_start_date" string = "Start Date"/>								
+											<field name="labour_end_date" string = "End Date"/>								
+											<field name="labour_lead_tech" string = "Lead Tech"/>								
+											<field name="labour_target" string = "Budget" sum="$"/>		
+											<field name="labour_actual" string = "Actual" sum="$"/>	
+											<field name="labour_difference" string = "Difference" sum="$"/>
+											<field name="labour_percentage" string = "%" sum="%"/>	
+											<field name="labour_total_hours" string = "Total Hours" sum="$"/>
+											<field name="labour_rate" string = "Rate" sum="%"/>								
+										</tree>
+									</field>
+									<!-- <h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em; margin-top: 0.6em;">Materials Consumed</h2> -->
+									<field  name="materials_consumed_ids" nolabel = "1" readonly="0">
+										<tree delete="false" create="false">
+											<field name="name" string = "Project ID" invisible="1"/>								
+											<field name="materials_consumed" string = "Materials Consumed"/>								
+											<field name="materials_required" string = "Required"/>								
+											<field name="materials_delivered" string = "Delivered"/>								
+											<field name="materials_source" string = "Source"/>								
+											<field name="materials_target" string = "Budget" sum="$"/>		
+											<field name="materials_actual" string = "Actual" sum="$"/>	
+											<field name="materials_difference" string = "Difference" sum="$"/>
+											<field name="materials_percentage" string = "%" sum="%"/>	
+											<field name="materials_metric" string = "Metric"/>
+											<field name="materials_rate" string = "Rate" sum="%"/>								
+										</tree>
+									</field>
+									
+								</div>
+								<div align="center">
+									<h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em;">Graph</h2>
+									<!-- <field name="graph_area" nolabel = "1" placeholder="Graph Space"/> -->
+									<img src='/cni/static/src/img/pie.png' class='calendar_img_tuto' width="480px" height="480px"/>
+								</div>
+							</group>
+						</div>
+						<div>
+							<group>
+							<div align="center">
+								<!-- <h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em; margin-top: 0.6em;">Expenses Incurred</h2> -->
+								<field  name="expenses_incurred_ids" nolabel = "1" readonly="0">
+									<tree delete="false" create="false">
+										<field name="name" string = "Project ID" invisible="1"/>								
+										<field name="expenses_incurred" string = "Expenses Incurred"/>								
+										<field name="expenses_soruce" string = "Source"/>								
+										<field name="expenses_target" string = "Budget" sum="$"/>		
+										<field name="expenses_actual" string = "Actual" sum="$"/>	
+										<field name="expenses_difference" string = "Difference" sum="$"/>
+										<field name="expenses_percentage" string = "%" sum="%"/>	
+										<field name="expenses_metric" string = "Metric"/>
+										<field name="expenses_rate" string = "Rate" sum="%"/>								
+									</tree>
+								</field>
+								<!-- <h2 align="center" style="color:#7C7BAD; margin-bottom: 0.6em; margin-top: 0.6em;">Overhead Allocations</h2> -->
+								<field  name="overhead_allocations_ids" nolabel = "1" readonly="0">
+									<tree delete="false" create="false">
+										<field name="name" string = "Project ID" invisible="1"/>								
+										<field name="overhead_allocations" string = "Overhead Allocations"/>								
+										<field name="overhead_smallest" string = "Smallest"/>								
+										<field name="overhead_largest" string = "Largest"/>								
+										<field name="overhead_average" string = "Average"/>								
+										<field name="overhead_target" string = "Budget" sum="$"/>		
+										<field name="overhead_actual" string = "Actual" sum="$"/>	
+										<field name="overhead_difference" string = "Difference" sum="$"/>
+										<field name="overhead_percentage" string = "%" sum="%"/>	
+										<field name="overhead_cost_hour" string = "Cost/Hour" sum="$"/>
+										<field name="overhead_percentage_of_total" string = "% of Total" sum="%"/>								
+									</tree>
+								</field>
+							</div>
+							</group>
+						</div>
+					</div>
+                    </page>
+					<page string = "Client Updates" groups = "cni.group_cni_project_manager">
+						<div align="center">
+							<group string = "Client Status Update">
+								<group>
+								<field name="jobassignmentid" invisible="0" width="100%"/> 
+								<field name="statuscd" width="50%"/>
+								<field name="acceptremarktxt" width="50%" attrs="{'invisible':[('statuscd','!=','ACCEPTED')]}"/>
+								<field name="acceptdatetime" width="50%" attrs="{'invisible':[('statuscd','!=','ACCEPTED')]}"/>
+								
+								<field name="enrouteremarktxt" width="50%" attrs="{'invisible':[('statuscd','!=','EN_ROUTE')]}"/>
+								<field name="enroutedatetime" width="50%" attrs="{'invisible':[('statuscd','!=','EN_ROUTE')]}"/>
+								
+								<field name="onsiteremarktxt" width="50%" attrs="{'invisible':[('statuscd','!=','ON_SITE')]}"/>
+								<field name="onsitedatetime" width="50%" attrs="{'invisible':[('statuscd','!=','ON_SITE')]}"/>
+								
+								<field name="completeremarktxt" width="50%" attrs="{'invisible':[('statuscd','!=','COMPLETE')]}"/>
+								<field name="completedatetime" width="50%" attrs="{'invisible':[('statuscd','!=','COMPLETE')]}"/>
+								
+								<field name="incompleteremarktxt" width="50%" attrs="{'invisible':[('statuscd','!=','INCOMPLETE')]}"/>
+								<field name="incompletedatetime" width="50%" attrs="{'invisible':[('statuscd','!=','INCOMPLETE')]}"/>
+								
+								<field name="rejectremarktxt" width="50%" attrs="{'invisible':[('statuscd','!=','REJECTED')]}"/>
+								<field name="rejectdatetime" width="50%" attrs="{'invisible':[('statuscd','!=','REJECTED')]}"/>
+								
+								<field name="tentativedatetime" width="50%" attrs="{'invisible':[('statuscd','!=','TENTATIVE')]}"/>
+								<field name="dispatcheddatetime" width="50%" attrs="{'invisible':[('statuscd','!=','DISPATCHED')]}"/>
+								
+								
+								</group>
+								<group>
+								<field name="resolutioncode" width="50%"/>
+								<field name="incompletereasoncd" width="50%" attrs="{'invisible':[('statuscd','!=','INCOMPLETE')],'required':[('statuscd','=','INCOMPLETE')]}"/> <!-- This field will only display when Status will be "OnSite" -->
+								<field name="rejectreasoncd" width="50%" attrs="{'invisible':[('statuscd','!=','REJECTED')],'required':[('statuscd','=','REJECTED')]}"/> <!-- This field will only display when Status will be "Rejected" -->
+								<field name="display_project_manager" readonly = "1"/>
+								</group>
+							</group>
+						</div>
+						<hr/>
+						<div align="center">
+							<group string = "Team Worker List">
+								<group>
+									<field name="requiredteamworkerlist" width="50%"/>
+									<field name="preferredteamworkerlist" width="50%"/>
+									<field name="prohibitedteamworkerlist" width="50%"/>
+								</group>
+								<group>
+									<field name="jobscheduledstartdate" string = "Job Schedule Start Date" width="50%"/>
+									<field name="jobscheduledenddate" string = "Job Schedule End Date" width="50%"/>
+								</group>
+							</group>
+						</div>
+						<hr/>
+						<div align="center" style="overflow-y: scroll;">
+							<group string = "Sent Client Status Updated Log">
+								<field name="handler_history" nolabel = "1" readonly = "1"/>
+							</group>
+						</div>
+					</page>
+					<page string = "Pre-Assembly" invisible="1">
+						<group><group>
+							   <field width = "50%" name="wbs" readonly="1" />
+							   <field width = "50%" name="network_id" readonly="1"  />
+						</group>
+						<group>
+								<field width = "50%" name="actv_desc" readonly="1" />
+								<field width = "50%" name="status" readonly="1" />
+						</group></group>
+					</page>					
+			   </notebook>
+				<xpath expr="//sheet" position="attributes">
+    			<attribute name="class">oe_form_sheet_width_wider</attribute>
+				</xpath>
+			  	</data>
+			  </field>	
+		    </record>
+
+
+		<record id="projectviewinherited" model="ir.ui.view">
+            <field name="name">project.project.inherit2</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project_issue.view_project_form_inherited"/>
+            <field name="arch" type="xml">
+               
+				<xpath expr="//field[@name='issue_count']" position="attributes">
+					<attribute name="string">Open Flags</attribute>
+                </xpath>
+				<xpath expr="//field[@name='issue_count']" position="after">
+
+					<button class="oe_inline oe_stat_button" type="action" attrs="{'invisible':[('use_issues','=', 0)]}" name="%(act_project_project_2_project_closed)d" icon="fa-bug">
+                        <field string="Closed Flags" name="closed_issue_count" widget="statinfo"/>
+                    </button>
+					<button class="oe_inline oe_stat_button" icon="fa-map-marker" name="open_map" string="Work Location" type="object"/>
+                </xpath>
+				<xpath expr="//button[@name='set_open']" position="after">
+					<button name="set_onhold" string="On Hold" type="object" states="open,pending,in_progress" groups="base.group_user"/>
+                </xpath>
+				<xpath expr="//button[@name='set_cancel']" position="replace">
+					<button name="set_cancel" string="Cancel Project" type="object" states="open,pending,in_progress"/>
+					<button name="set_completed" string="Completed" type="object" states="open,pending,in_progress" groups="base.group_user"/>
+                </xpath>
+				<xpath expr="//button[@name='set_done']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//button[@name='set_completed']" position="after">
+					<button name="set_done" string="Close Project" type="object" states="open,in_progress,pending,Completed,Jeopardy" groups="base.group_user"/>
+                </xpath>
+				
+				<xpath expr="//button[@name='set_open']" position="attributes">
+					<attribute name="states">pending,OnHold,Completed,Jeopardy</attribute>
+				</xpath>
+
+				<xpath expr="//field[@name='state']" position="replace">
+					<field  name="state" widget="statusbar" statusbar_visible="open,in_progress,OnHold,cancelled,Completed,close" statusbar_colors='{"Cancel":"red"}' readonly="1"/>
+				</xpath>
+				
+				<xpath expr="//button[@name='set_template']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//button[@name='set_pending']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//notebook/page[@string='Other Info']" position="replace">
+                </xpath>
+				<xpath expr="//group[@name='group_alias']" position="replace">
+                </xpath>
+				 <xpath expr="//notebook/page[@string='Project Stages']" position="replace">
+                </xpath>
+
+				<xpath expr="//field[@name='user_id']" position="replace">
+					<field  name="project_manager" />
+				</xpath>
+		</field>
+        </record>
+
+<!--Time sheet Inherited-->
+
+<!--Project task form view-->
+<record model="ir.ui.view" id="view_project_task_form_inherited">
+    <field name="name">project.task</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_form2"/>
+    <field name="arch" type="xml">
+        <data>
+            <field name="user_id" position="replace"/>
+            <field name="project_id" position="replace"/>
+            <field name="reviewer_id" position="replace"/>
+            <field name="planned_hours" position="replace"/>
+            <field name="date_deadline" position="replace"/>
+            <field name = "progress" position = "replace"/>
+            <group>
+				<group >
+					<field name="project_id" attrs="{'readonly':[('restrict_access','=',True)]}" />
+					<field name="user_id" attrs="{'readonly':[('restrict_access','=',True)]}" />
+					<field name="reviewer_id" attrs="{'readonly':[('restrict_access','=',True)]}" />
+				</group>
+				<group >
+					<field name = "task_progress" widget = "progressbar" />
+					<field name="date_deadline" attrs="{'readonly':[('restrict_access','=',True)]}" />
+					<field name="task_planned_hours" widget="float_time" groups = "cni.group_cni_project_manager"/>
+					<field name="override_hrs" attrs="{'readonly':[('restrict_access','=',True)]}"/>
+				</group>
+				<field name="restrict_access" invisible = "1"/>
+				<field name="date_start" invisible = "1"/>            
+            </group>             
+			<notebook>
+				<page string = "Material">
+					<field name="consumable_products_ids" readonly="1"/>
+			    </page>						    	
+			</notebook>
+			<xpath expr="/form/sheet[@string='Task']/notebook/page[@string='Description']/field[@name='work_ids']/tree[@string='Task Work']/field[@name='hours']" position="before">
+			  <field name="activity_time" widget="float_time" string="Budget Hours" groups = "cni.group_cni_project_manager"/>
+			</xpath>
+			<xpath expr="/form/sheet[@string='Task']/notebook/page[@string='Description']/field[@name='work_ids']/tree[@string='Task Work']/field[@name='user_id']" position="after">
+				<field name="image"  widget="image" height="25px" display="thumbnail"/>
+			</xpath>
+        </data>
+    </field>
+</record>
+
+<!--
+this portion of code may late ron un commented when we are sucsessfull to separate tasks stages and issues stages
+<record model="ir.ui.view" id="inherit_task_form1">
+		      <field name="name">project.task.inherit11</field>
+		      <field name="model">project.task</field>
+		      <field name="inherit_id" ref="project.view_task_form2"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		     <xpath expr = "//field[@name ='stage_id']" position = "replace">
+				<field name="stages" widget="statusbar" clickable="True"
+                            options="{'fold_field': 'fold'}"/>
+				</xpath>
+		      </field>
+		    </record>-->
+
+
+	<!--Project task tree view inherited-->
+	
+
+	<record model = "ir.ui.view" id = "project_taks_tree_inherited">
+	<field name = "name">project.task.tree.inh</field>
+	<field name = "model">project.task</field>
+	<field name = "inherit_id" ref = "project.view_task_tree2" />
+	<field name = "arch" type = "xml">
+		<xpath expr = "//field[@name = 'progress']" position = "replace">
+		<field name = "task_progress" widget = "progressbar"/>
+		</xpath>
+		<xpath expr = "//field[@name = 'planned_hours']" position = "replace">
+		<field name = "task_planned_hours" groups = "cni.group_cni_project_manager"/>
+		</xpath>
+		<xpath expr = "//field[@name = 'remaining_hours']" position = "replace">
+		<field name = "task_rem_hours" groups = "cni.group_cni_project_manager"/>
+		</xpath>
+		
+	</field>
+	</record>
+
+
+<!--Task handler log-->
+<record id="view_taskhandler_logs_tree" model="ir.ui.view">
+        <field name="name">project.task.handling.logs.tree</field>
+        <field name="model">project.task.handling.logs</field>
+        <field name="arch" type="xml">
+        <tree>
+            <field name="name"/>
+            <field name="project_id" invisible = "1"/>
+            <field name="remarks"/>
+             <field name="reason"/>
+			 <field name="event_date"/>
+             <field name="event_by"/>
+        </tree>
+        </field>
+    </record>
+
+<!--Project inherited for projectmanager invisibly on slection-->
+<record model="ir.ui.view" id="inherit_res_users_form1">
+		      <field name="name">res.users.form</field>
+		      <field name="model">res.users</field>
+		      <field name="inherit_id" ref="base.view_users_form"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+				<field name="lang" position="after">
+				<field name="work_on_task" />
+			  </field>
+		  	</field>
+
+    </record>
+<record model="ir.ui.view" id="view_project_task_work">
+    <field name="name">project.task.workk</field>
+    <field name="model">project.task.work</field>
+    <field name="inherit_id" ref="project.view_task_work_tree"/>
+    <field name="arch" type="xml">
+        <field name="date" position="before">
+							<field name = "user_id" string = "Assigned Technician" />
+							<field name = "activity_time" string = "Budget Hours" />
+        </field>
+    </field>
+</record>
+
+
+	
+<!--Employee inherited-->
+
+		<record model="ir.ui.view" id="inherit_employee_form">
+		      <field name="name">hr.employee.inherit</field>
+		      <field name="model">hr.employee</field>
+		      <field name="inherit_id" ref="hr.view_employee_form"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		      <field name="active" position="after">
+			  	</field>
+				 <div class="oe_right oe_button_box" name="button_box">
+					<button class="oe_inline oe_stat_button" type="action" string = "Hours Report" name="%(action_print_hr_hours)d" icon="fa-tasks">
+                        </button>
+                  </div>
+				<notebook>
+					<page string = "Projects" invisible="1">
+					<field name="project_assigned" readonly="1"/>
+			    	</page>
+					<page string = "Assigned Assets">
+					<field name="tools_acquired" readonly="1"/>
+			    	</page>
+			   </notebook>
+		      </field>
+		    </record>
+
+<record model="ir.ui.view" id="inherit_employee_form">
+		      <field name="name">hr.employee.inherit</field>
+		      <field name="model">hr.employee</field>
+		      <field name="inherit_id" ref="hr.view_employee_form"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		     <xpath expr = "//field[@name ='mobile_phone']" position = "before">
+				<field name = "extenstion_no"/>
+				</xpath>
+		      </field>
+		    </record>
+
+<record model="ir.ui.view" id="inherit_employee_form3">
+		      <field name="name">hr.employee.inherit</field>
+		      <field name="model">hr.employee</field>
+		      <field name="inherit_id" ref="hr.view_employee_form"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		     <xpath expr = "//field[@name ='name']" position = "after">
+				<label for="emp_srno" class="oe_edit_only" style="font-weight: bold; font-size: 13px"/>
+				<field name = "emp_srno"/>
+				</xpath>
+		      </field>
+		    </record>
+
+<record model="ir.ui.view" id="inherit_partner_form">
+		      <field name="name">res.partner.inherit</field>
+		      <field name="model">res.partner</field>
+		      <field name="inherit_id" ref="base.view_partner_form"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+				<xpath expr="//sheet/div[@name='buttons']" position="inside">
+					<button class="oe_inline oe_stat_button" icon="fa-map-marker" name="open_map" string="Google Maps" type="object"/>
+				</xpath>			
+				<xpath expr = "//field[@name ='mobile']" position = "before">
+					<field name = "client_ext_no"/>
+				</xpath>
+				<xpath expr = "//field[@name ='category_id']" position = "after">
+					<field name = "site_contact" string="Site Contact"/> <b>Is a Site Contact?</b>
+				</xpath>
+				<xpath expr="//form[@string='Contact']/sheet/group/field[@name='phone']" position="after">
+					<field name = "client_ext_no" string="Ext"/>
+				</xpath>				
+				<xpath expr="//form[@string='Contact']/sheet/group/field[@name='function']" position="before">
+					<field name = "site_contact" string="Is a Site Contact?"/>
+				</xpath>				
+		      </field>
+		    </record>
+		    
+	<record model="ir.ui.view" id="inherit_partner_form22">
+		      <field name="name">res.partner.inherit</field>
+		      <field name="model">res.partner</field>
+		      <field name="inherit_id" ref="base.view_partner_simple_form"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		     <xpath expr = "//field[@name ='mobile']" position = "before">
+				<field name = "client_ext_no"/>
+				</xpath>
+		      </field>
+		    </record>   
+
+
+<!--asset.asset inherited-->
+
+		<record model="ir.ui.view" id="inherit_asset_for_reserved_form">
+		      <field name="name">asset.asset.inherit</field>
+		      <field name="model">asset.asset</field>
+		      <field name="inherit_id" ref="asset.assets_form_view"/>
+		      <field name="type">form</field>
+		      <field name = "arch" type = "xml">
+				<xpath expr = "//field[@name ='warranty_end_date']" position = "before">
+				<field name = "reserved"/>
+				</xpath>
+			</field>
+		    </record>
+
+			<record model="ir.ui.view" id="inherit_employee__asset_form">
+		      <field name="name">asset.asset.inherit</field>
+		      <field name="model">asset.asset</field>
+		      <field name="inherit_id" ref="asset.assets_form_view"/>
+		      <field name="type">form</field>
+		      <field name="arch" type="xml">
+		      <field name="warranty_end_date" position="after">
+			  	</field>
+					<notebook>
+					<page string = "Reservations">
+					<button name="%(action_reserve_asset)d" string="Reserve This Tool"  type="action" class="oe_highlight" groups=""/>
+					<field name="asset_reservation_ids" readonly="0"/>
+			    	</page>
+			   </notebook>
+		      </field>
+		    </record>
+
+<!--filter on hr_employee-->
+<record id="ir_actions_open_selected_employee" model="ir.actions.server">
+            <field name="sequence" eval="5"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_filter_employees_open"/>
+            <field name="code">action = pool.get('hr.filter.employees.open').open_current_employee(cr, uid, None, context)</field>
+            <field name="condition">True</field>
+            <field name="name">My Profile</field>
+        </record>
+ 
+<!--Expense tree inherited-->
+		<record model = "ir.ui.view" id = "view_expenses_tree_ihrt">
+			<field name = "name">view_expenses_tree.tree.inhr</field>	
+			<field name = "model">hr.expense.expense</field>
+			<field name = "inherit_id" ref = "hr_expense.view_expenses_tree"/>
+			<field name = "arch" type = "xml">
+				<xpath expr = "//field[@name ='employee_id']" position = "after">
+				<field name = "project_id"/>
+				</xpath>
+			</field>
+
+
+		</record>
+
+       
+<!--filter Enpenses per employee-->
+<record id="ir_actions_epenses_per_employee" model="ir.actions.server">
+            <field name="sequence" eval="5"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_filter_employees_expenses"/>
+            <field name="code">action = pool.get('hr.filter.employees.expenses').open_current_employee(cr, uid, None, context)</field>
+            <field name="condition">True</field>
+            <field name="name">My Expenses</field>
+        </record>
+
+<!--Filter on suer so that cni local admin cannot see admin users of technical-->
+	<record id="ir_action_rlter_users" model="ir.actions.server">
+            <field name="sequence" eval="6"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_filter_employees_expenses"/>
+            <field name="code">action = pool.get('hr.filter.employees.expenses').filter_users(cr, uid, None, context)</field>
+            <field name="condition">True</field>
+            <field name="name">Active Users</field>
+        </record>
+
+
+<!--Timesheet_sheet-->
+
+		 
+
+	<record model="ir.ui.view" id="inherit_timesheet_sheet_form">
+		<field name="name">hr_timesheet_sheet.form.inherited</field>
+		<field name="model">hr_timesheet_sheet.sheet</field>
+		<field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+			<data>
+				<field name="date_from" position = "replace" />
+				<field name="date_to"  position = "replace"/>
+				<group>
+					<group>
+						<field name="date_from" required = "1" on_change="onchange_date(date_from, 'compare_date_from')" />
+						<field name="date_to" required = "1" on_change="onchange_date(date_from,' compare_date_to')" />
+					</group>
+				</group>
+				<xpath expr = "//field[@name ='account_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='account_id']" position="attributes">
+				   <attribute name="options">{'no_open': '1','no_create': '1', 'no_create_edit': '1'}</attribute>
+				</xpath>
+				<xpath expr = "//field[@name ='account_id']" position="after">
+					<field name="task_id" on_change="onchange_task(task_id)"/>
+					<field name="activity_id"/>
+				</xpath>
+				<xpath expr = "//field[@name ='to_invoice']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+<!--				<xpath expr = "//field[@name ='unit_amount']" position="attributes">
+					<attribute name="readonly">1</attribute>
+				</xpath>
+-->
+				<xpath expr = "//field[@name ='unit_amount']" position="after">
+					<field name="comments"/>
+				</xpath>
+				<xpath expr = "//field[@name ='unit_amount']" position="before">
+					<field name="start_time" widget="float_time"/>
+					<field name="end_time" widget="float_time" on_change="set_onchange_endtime(start_time,end_time)"/>
+				</xpath>
+				<!-- <xpath expr = "//field[@name ='name']" position="attributes">
+					<attribute name="string">Site</attribute>
+				</xpath> -->
+				<xpath expr = "//field[@name ='total_attendance']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+
+				<xpath expr = "//field[@name ='task_id']" position="before">
+					<field name="project_id" string="Project / Customer" options="{'no_quick_create': 1, 'no_create_edit' : 1, 'no_create': 1, 'no_open': 1}" on_change="on_change_timesheet_project_id(project_id)"/>
+				</xpath>
+				
+				
+			</data>
+		</field>
+	</record>
+
+		
+	<record id="att_adjustmentlines_tree" model="ir.ui.view">
+			<field name="name">attendance.adjustment.lines.tree</field>
+		    <field name="model">attendance.adjustment.lines</field>
+		    <field name="arch" type="xml">
+		    <tree editable = "top" string="Attendance Adjustment">
+		        
+		        <field name="timesheet_idd" readonly = "1"/>
+		        <field name="duration" readonly = "1"/>
+				<field name="regular_hours" readonly = "1" />
+				<field name="over_under_time" readonly = "1"/>
+				<field name="input_hours"  required = "1"/>
+				<field name="over_time_adjustemnt" on_change="onchange_decision(over_time_adjustemnt,'state')" />
+				<field name="state" invisible = "1"/>
+				
+		    </tree>
+		    </field>
+		</record>
+
+<record id="projecexpense_id" model="ir.ui.view">
+            <field name="name">hr.expense.expense.inherit2</field>
+            <field name="model">hr.expense.expense</field>
+            <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
+            <field name="arch" type="xml">
+               
+				<xpath expr="//field[@name='employee_id']" position="before">
+                    <field name = "project_id" on_change="onchange_rpjmanager(project_id,department_id)"/>
+                </xpath>
+                <xpath expr="//field[@name='department_id']" position="replace">
+				    <field name = "department_id" on_change="onchange_rpjmanager(project_id,department_id)"/>
+                </xpath>
+				<xpath expr = "//field[@name ='date']" position="attributes">
+					<attribute name="string">Submitted Date</attribute>
+				</xpath>				
+				<xpath expr="//field[@name='date']" position="after">
+					<field name="date_valid" string="Approved Date" attrs="{'invisible': [('state','=','draft')]}" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_hr_user']}"/>
+				</xpath>
+				<xpath expr="//field[@name='name']" position="before">
+					<field name="pro_manager" string="Expense Manager"/>				
+				</xpath>
+				<xpath expr="//field[@name='user_valid']" position="replace">
+					<field name="user_valid" string="Approved By" attrs="{'invisible': [('state','=','draft')]}" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_hr_user']}"/>
+				</xpath>
+				<xpath expr = "//field[@name ='name']" position="attributes">
+					<attribute name="required">False</attribute>
+				</xpath>				
+				<xpath expr = "//field[@name ='department_id']" position="replace">
+				</xpath>
+				<xpath expr="//field[@name='name']" position="after">
+					<field name="department_id" string="Department"/>					
+				</xpath>
+				<xpath expr="//separator[contains(@string, 'Notes')]"  position="replace">
+					<separator string="Comments"/>
+				</xpath>
+				<xpath expr="//field[contains(@placeholder, 'Free Notes')]"  position="replace">
+					<field name="note" placeholder="Free Comments..."/>
+				</xpath>
+		</field>
+        </record>
+<record model="ir.ui.view" id="ocl_hr_expense">
+      <field name="name">hr.expense.line.tree</field>
+      <field name="model">hr.expense.expense</field>
+      <field name="inherit_id" ref="hr_expense.view_expenses_form" />
+      <field name="arch" type="xml">
+        <!--<xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='product_id']" position="replace">
+          <field name="product_id" string="Expense Type"/>
+        </xpath>-->
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='date_value']" position="after">
+          <field name="expense_types" string="Expense Type"/>
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='date_value']" position="replace">
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='product_id']" position="before">
+          <field name="date_value" string="Date"/>
+        </xpath>		
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='name']" position="replace">
+          <field name="name" string="Expense Description"/>
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='unit_amount']" position="before">
+          <field name="taxes_paid" string="Taxes Paid" readonly="0"/>
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='total_amount']" position="replace">
+          <field name="total_amount" string="Total Charged"/>
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='unit_amount']" position="replace">
+          <field name="unit_amount" string="Purchases Paid"/>
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='unit_amount']" position="after">
+          <field name="receipt_no" string="Attached Receipt #"/>
+        </xpath>
+		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='total_amount']" position="before">
+          <field name="budget_tags" string="Budget Tag" widget="many2many_tags"/>
+        </xpath>		
+
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='ref']" position="attributes">
+			<attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='analytic_account']" position="attributes">
+			<attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='uom_id']" position="attributes">
+			<attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='unit_quantity']" position="attributes">
+			<attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='product_id']" position="attributes">
+			<attribute name="invisible">1</attribute>
+        </xpath>
+		
+      </field>
+    </record>
+
+<record id="ir_action_filter_projects_emp" model="ir.actions.server">
+            <field name="sequence" eval="6"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_filter_employees_expenses"/>
+            <field name="code">action = pool.get('hr.filter.employees.expenses').filter_projects(cr, uid, None, context)</field>
+            <field name="condition">True</field>
+            <field name="name">Projects For Managers</field>
+        </record>
+        
+    <record id="ir_action_filter_tasks" model="ir.actions.server">
+            <field name="sequence" eval="6"/>
+            <field name="state">code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_filter_employees_expenses"/>
+            <field name="code">action = pool.get('hr.filter.employees.expenses').filter_tasks(cr, uid, None, context)</field>
+            <field name="condition">True</field>
+            <field name="name">Tasks</field>
+        </record>
+    
+<!--ir_attachement inherited-->
+	
+
+	<record model = "ir.ui.view" id = "document_dirct_inherited">
+	<field name = "name">ir.attachment.inh</field>
+	<field name = "model">ir.attachment</field>
+	<field name = "inherit_id" ref = "base.view_attachment_form" />
+	<field name = "arch" type = "xml">
+		<xpath expr = "//field[@name = 'res_model']" position = "attributes">
+		<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//field[@name = 'res_id']" position = "attributes">
+		<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//field[@name = 'res_name']" position = "attributes">
+		<attribute name="invisible">1</attribute>
+		</xpath>
+		<xpath expr = "//field[@name = 'user_id']" position = "replace">
+		<field name="user_id" string = "User" />
+		<field name="attachment_soruce" on_change="onchange_workorder(attachment_soruce)" />
+		<field name="contact" domain="[('parent_id','=',partner_id)]" />
+		</xpath>
+		<xpath expr = "//field[@name = 'partner_id']" position = "replace">
+		<field name="partner_id" string = "Client" />
+		<field name="issue_id"  attrs="{'readonly':[('attachment_soruce','in',['Work_order','Other'])],'required':[('attachment_soruce','=','Issue')]}" />
+		</xpath>
+		
+		
+	</field>
+	</record>
+
+<!--company inherited-->
+	
+
+	<record model = "ir.ui.view" id = "company_inherited_picundercons">
+	<field name = "name">res.company.inh</field>
+	<field name = "model">res.company</field>
+	<field name = "inherit_id" ref = "base.view_company_form" />
+	<field name = "arch" type = "xml">
+		
+		<xpath expr="//notebook/page[@string='General Information']" position = "after">
+		<page string = "Message">		
+		<field name="pic" widget="image" />
+		</page>		
+		</xpath>
+		
+	</field>
+	</record>
+
+<!-- form under construction-->
+<record id="rform_underconstrucs_form" model="ir.ui.view">
+		<field name="name">form.underconstruction.form</field>
+	    <field name="model">form.underconstruction</field>
+	    <field name="arch" type="xml">
+		<form edit="0">
+			<sheet>
+				<!--<field name="company" readonly = "1"  />-->
+				<!--<field name="pic" widget="image" />-->
+	            <img src='/cni/static/src/img/uc.jpg' class='calendar_img_tuto'/>
+	    	</sheet>
+		</form>
+	    </field>
+    </record>
+
+<record id="action_rform_underconstrucs" model="ir.actions.act_window">
+	    <field name="name">Under Construction</field>
+	    <field name="res_model">form.underconstruction</field>
+	    <field name="view_type">form</field>
+		<field name="view_mode">form</field>
+	</record>
+
+
+<record id="view_prj_graph" model="ir.ui.view">
+            <field name="name">project.projectt.graph</field>
+            <field name="model">project.project</field>
+            <field name="arch" type="xml">
+                <graph orientation="horizontal" string="Helpdesk" type="pivot" stacked="True">
+			                     <field name="project_manager" type="row"/>
+			                    <field name="hours_budget_remain_kanban" interval="month" type="col"/>
+			                    <field name="hours_budget_remain" type="measure"/>
+			                </graph>
+            </field>
+        </record>
+
+
+
+<record id="action_prjgraph_graph" model="ir.actions.act_window">
+            <field name="name">project graph</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph</field>
+            <field name="view_id" ref="view_prj_graph"/>
+        </record>
+
+
+<!--Project issues inherited -->
+		<record model = "ir.ui.view" id = "project_main_form-ihrted">
+			<field name = "name">project.issue.form</field>	
+			<field name = "model">project.issue</field>
+			<field name = "inherit_id" ref = "project_issue.project_issue_form_view"/>
+			<field name = "arch" type = "xml">
+				<xpath expr = "//field[@name ='name']" position = "attributes">
+				<attribute name="string">Flag Name</attribute>
+				</xpath>
+				<xpath expr = "//field[@name ='categ_ids']" position = "attributes">
+				<attribute name="string">Classification</attribute>
+				</xpath>
+				<xpath expr = "//field[@name ='categ_ids']" position = "attributes">
+				<attribute name="string">Classification</attribute>
+				</xpath>
+			</field>
+
+
+		</record>
+</data>
+</openerp>

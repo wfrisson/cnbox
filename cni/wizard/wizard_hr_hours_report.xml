@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+    <!-- Student Change Regular -->
+
+        <record id="view_techinician_hours" model="ir.ui.view">
+            <field name="name">print.technician.hours</field>
+            <field name="model">print.technician.hours</field>
+            <field name="arch" type="xml">
+                <form string="Print Employee Working Hours" version="7.0">
+                    <group >
+					<group col="6" String = "" >
+                        <field name="employee"/>
+						 <newline/><field name="date_from" placeholder = "From"/>
+						 <newline/><field name="date_to"  placeholder = "To"/>
+						 </group>
+						
+                    </group>
+                    <group>
+                     <p style = "color:red;">Print Employee Working Hours</p>
+                    </group>
+                    <footer>
+                        <button string="Print" name="proceed_with_print" type="object" class="oe_highlight"/>
+                        or
+                        
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+               </form>
+            </field>
+          </record>
+
+  <!-- View CMS Student Admit -->
+
+        <record id="action_print_hr_hours" model="ir.actions.act_window">
+            <field name="name">Print Hours</field>
+            <field name="res_model">print.technician.hours</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+           <field name="view_id" ref="view_techinician_hours"/>
+           <field name="target">new</field>
+        </record>
+</data>
+</openerp>

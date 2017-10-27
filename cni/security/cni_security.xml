@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="0">
+
+	<!-- CNI Groups  -->
+    <record id="group_cni_admin" model="res.groups">
+        <field name="name">GSS Support</field>
+    </record> 
+
+	<record id="group_import_project_data" model="res.groups">
+        <field name="name">Utility Manager</field>
+    </record>  
+    
+    <record id="group_cni_technician" model="res.groups">
+        <field name="name">Group CNI Technician</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    
+    <record id="group_cni_project_manager" model="res.groups">
+        <field name="name">Project Manager</field>
+    </record>   
+    
+     <record id="group_cni_administrator2" model="res.groups">
+        <field name="name">CNI Administrator</field>
+    </record>    
+   
+</data>
+</openerp>
