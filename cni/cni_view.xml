@@ -10,8 +10,9 @@
 		<xpath expr = "//field[@name = 'total_attendance']" position = "replace">
 		<field name = "schedule_shift" readonly = "1"/>
 		</xpath>
-		<xpath expr = "//field[@name = 'total_timesheet']" position="attributes">
-		<attribute name="string">Total Timesheet</attribute>
+		<xpath expr = "//field[@name = 'total_timesheet']" position="replace">
+		<field name="display_total_timesheet" readonly = "1"/>
+		<!--<attribute name="string">Total Timesheet</attribute>-->
 		</xpath>
 		
 	</field>
@@ -26,12 +27,22 @@
 	<field name="arch" type="xml">
 		<field name="total_difference" position="after" help="Scheduled Shift - Total Timesheet">
 		<field name="total_overtime"  help="Total Timesheet - Scheduled Shift"/>
+		<field name="overtime_status" readonly= "1"/>
 	</field>
 	<notebook>
 		<page string = "Banked Overtime">
 			<group><field name="total_hours" readonly = "1" /><field name="remarks" readonly = "1" /></group>
 			<group><field name="over_under_time" readonly = "1" /></group>
-			<field name="adjustment_ids" context = " {'parent_id':active_id}" />
+			<field name="adjustment_ids" context = " {'parent_id':active_id}" /><!--this object will be removed if not needed -->
+			<field name="hours_bank_ids"  widget="one2many_list" invisible ="1">
+							<tree>
+							<field name="date_entered" readonly="1" /> 
+							<field name="timesheet_id" readonly="1" /> 
+							<field name="description" readonly="1" /> 
+							<field name="debit" readonly="1" /> 
+							<field name="credit" readonly="1" /> 
+							</tree>
+					</field>
 			<button name="load_attcendance" string="Show My Attendance" states="new,draft" type="object" class="oe_highlight" groups="base.group_user"/>
 		</page>
 	</notebook>
@@ -2528,6 +2539,28 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 	
 <!--Employee inherited-->
 
+		<record model="ir.ui.view" id="inherit_employee_form2">
+		      <field name="name">hr.employee.inherit2</field>
+		      <field name="model">hr.employee</field>
+		      <field name="inherit_id" ref="hr.view_employee_form"/>
+		      <field name="arch" type="xml">
+		       <xpath expr='//page[@string="Personal Contact"]' position="after">
+            	<page string="Hours Bank">
+                    <field name="hours_bank" widget="one2many_list" colspan="4" readonly="1">
+						<tree>
+							<field name="date_entered"/>
+							<field name="week_num" string="Week Number"/>
+							<field name="description"/>
+							<field name="debit"/>
+							<field name="credit"/>
+							<field name="balance"/>
+						</tree>
+					</field>
+                  </page>
+                  </xpath>
+		      </field>
+		    </record>
+
 		<record model="ir.ui.view" id="inherit_employee_form">
 		      <field name="name">hr.employee.inherit</field>
 		      <field name="model">hr.employee</field>
@@ -2655,7 +2688,7 @@ this portion of code may late ron un commented when we are sucsessfull to separa
             <field name="name">My Profile</field>
         </record>
  
-<!--Expense tree inherited-->
+<!--Expense tree inherited
 		<record model = "ir.ui.view" id = "view_expenses_tree_ihrt">
 			<field name = "name">view_expenses_tree.tree.inhr</field>	
 			<field name = "model">hr.expense.expense</field>
@@ -2668,7 +2701,7 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 
 
 		</record>
-
+-->
        
 <!--filter Enpenses per employee-->
 <record id="ir_actions_epenses_per_employee" model="ir.actions.server">
@@ -2710,6 +2743,9 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 					<group>
 						<field name="date_from" required = "1" on_change="onchange_date(date_from, 'compare_date_from')" />
 						<field name="date_to" required = "1" on_change="onchange_date(date_from,' compare_date_to')" />
+					</group>
+					<group>
+					<field name="bank_it" />
 					</group>
 				</group>
 				<xpath expr = "//field[@name ='account_id']" position="attributes">
@@ -2761,10 +2797,10 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 		        
 		        <field name="timesheet_idd" readonly = "1"/>
 		        <field name="duration" readonly = "1"/>
-				<field name="regular_hours" readonly = "1" />
-				<field name="over_under_time" readonly = "1"/>
+				<field name="regular_hours" invisible = "1" />
+				<field name="over_under_time" invisible = "1"/>
 				<field name="input_hours"  required = "1"/>
-				<field name="over_time_adjustemnt" on_change="onchange_decision(over_time_adjustemnt,'state')" />
+				<field name="over_time_adjustemnt" on_change="onchange_decision(over_time_adjustemnt,'state')" readonly="1"/>
 				<field name="state" invisible = "1"/>
 				
 		    </tree>
@@ -2777,9 +2813,9 @@ this portion of code may late ron un commented when we are sucsessfull to separa
             <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
             <field name="arch" type="xml">
                
-				<xpath expr="//field[@name='employee_id']" position="before">
+				<!--<xpath expr="//field[@name='employee_id']" position="before">
                     <field name = "project_id" on_change="onchange_rpjmanager(project_id,department_id)"/>
-                </xpath>
+                </xpath>-->
                 <xpath expr="//field[@name='department_id']" position="replace">
 				    <field name = "department_id" on_change="onchange_rpjmanager(project_id,department_id)"/>
                 </xpath>
@@ -2820,10 +2856,18 @@ this portion of code may late ron un commented when we are sucsessfull to separa
           <field name="product_id" string="Expense Type"/>
         </xpath>-->
 		
-        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='date_value']" position="after">
-          <field name="expense_types" string="Expense Type"/>
+		 <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='date_value']" position="after">
+			<field name = "project_id" string="Reporting Office" />
         </xpath>
 		
+        <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='project_id']" position="after">
+          <field name="expense_types" string="Expense Type"/>
+        </xpath>
+
+		 <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='expense_types']" position="after">
+          <field name="credit_card" string="Credit Card"/>
+        </xpath>
+
         <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='date_value']" position="replace">
         </xpath>
 		

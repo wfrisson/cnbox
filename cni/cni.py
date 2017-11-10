@@ -4042,6 +4042,7 @@ class hr_employee(osv.osv):
     _columns = {
     'tools_acquired': fields.one2many('asset.requisition', 'employee', 'Tools'),
     'project_assigned': fields.one2many('daily.material.reconciliation', 'project', 'Projects'),
+    'hours_bank': fields.one2many('employee.hours.bank', 'description', 'Hours Bank'),
     'extenstion_no':fields.char('Ext'),
     'emp_srno':fields.char('Employee ID'),
     'emp_srno_calc':fields.function(calcemp, method=True,  size=256, string='Employee No',type='char'),
@@ -4745,6 +4746,47 @@ class hr_timesheet_sheet(osv.osv):
     _name = "hr_timesheet_sheet.sheet"
     _inherit = "hr_timesheet_sheet.sheet"
     _description="Timesheet"
+    
+    
+
+    def create(self, cr, uid, vals, context=None, check=True):
+#         result = 0
+        if vals['bank_it'] == True:
+            
+            result = super(osv.osv, self).create(cr, uid, vals, context)
+            for f in self.browse(cr,uid,result):
+                
+                debit = 0
+                credit = 0
+                description = ''
+                
+            # previously was compared with tota_hours instead of total_timesheet
+                if f.total_timesheet > f.schedule_shift:
+                    f.display_total_timesheet = f.schedule_shift  # Just added this field for view in timesheet
+                    debit = f.total_overtime
+                    credit = 0
+                    description = "Overtime for current week is banked"
+                    remarks = 'Overtime'
+                      
+                elif f.total_timesheet < f.schedule_shift:
+                    raise osv.except_osv(('Entry Not Valid'),('Your hours are less than required shift hours,please uncheck "Bank My Overtime" checkbox!'))
+#                     f.display_total_timesheet = f.total_timesheet
+#                     debit = 0
+#                     credit = f.total_difference
+#                     description = "Deficiency for current week is recorded in employee hours book"
+#                     remarks = 'Deficiency'
+                elif  f.total_timesheet == f.schedule_shift:
+                    # no need to record something in hours bank, simply exit
+                    return result
+                self.pool.get('employee.hours.bank').create(cr,uid,{'employee_id':f.employee_id.id,'debit':debit, 'credit': credit, 'description': description, 'timesheet_id': result})
+                self.write(cr,uid,f.id,{'overtime_status':'Banked'}) 
+        else:
+            vals['overtime_status'] = 'Encashed'
+            result = super(osv.osv, self).create(cr, uid, vals, context)
+            for f in self.browse(cr,uid,result):
+                f.display_total_timesheet = f.total_timesheet
+                      
+        return result
 
 
     def write(self, cr, uid, ids, vals, context=None, check=True, update_check=True):
@@ -4754,10 +4796,10 @@ class hr_timesheet_sheet(osv.osv):
                 adjustment_rec = self.pool.get('attendance.adjustment.lines').browse(cr,uid,adjustment_id)
                 for adjustment in adjustment_rec:
                     
-                    if adjustment.over_time_adjustemnt == 'adjust_from_bank':
-                        toal_overtime = f.total_vertime
-                        total_defc = abs(adjustment.over_undertimeover_under_time)
-                        if total_defc > toal_overtime:
+                    if adjustment.over_time_adjustemnt == 'Paid':
+                        total_overtime = f.total_overtime
+                        total_defc = abs(adjustment.over_under_time)
+                        if total_defc > total_overtime:
                             raise osv.except_osv(('Insufficient Bank hours'),("You dont have enough bank hours to balance hours shortage. Earn more overtime then adjust your hours."))
             
         
@@ -4773,7 +4815,28 @@ class hr_timesheet_sheet(osv.osv):
                 result[f.id] =  float(f.total_timesheet)- float(f.schedule_shift)
 #            result[f.id] = 0
         return result
+   
+    def get_total_banked_overtime(self, cr, uid, ids, name, args, context=None):
         
+        debit_value = {}
+        total_balance = {}
+        
+        rec = self.browse(cr, uid, ids, context)
+        
+        debit_query = """select sum(debit) from employee_hours_bank where employee_id = """ + str(rec.employee_id.id) 
+        cr.execute(debit_query)
+        debit_value = cr.fetchone()
+        debit_str = str(debit_value).replace('\'', '').replace(',', '').replace('(', '').replace(')','')
+        credit_query = """select sum(credit) from employee_hours_bank where employee_id = """ + str(rec.employee_id.id) 
+        cr.execute(credit_query)
+        credit_value = cr.fetchone()
+        credit_str = str(credit_value).replace('\'', '').replace('\'', '').replace(',', '').replace('(', '').replace(')','')
+        
+        
+        total_balance[rec.id] = float(debit_str) - float(credit_str)
+        print total_balance
+
+        return total_balance   
     
     
     def load_attendance(self, cr, uid, ids, context=None):
@@ -4854,19 +4917,24 @@ class hr_timesheet_sheet(osv.osv):
     def get_diff(self,cr,uid,ids,names,args,context = None):
         result = {}
         for f in self.browse(cr,uid,ids):
-            result[f.id] = float(f.schedule_shift) - float(f.total_timesheet)
+            result[f.id] = float(f.schedule_shift) - float(f.display_total_timesheet)
 #            result[f.id] = 0
         return result
 
     _columns = { 
+                'display_total_timesheet': fields.float('Total Timesheet'),
+                'bank_it': fields.boolean('Bank My Overtime'),
                'adjustment_ids':fields.one2many('attendance.adjustment.lines','timesheet_idd','Adjustment'),
                'total_overtime':fields.function(get_total_overtime, method=True, string='Overtime',type='float'),
                'total_hours':fields.float('Total Hours'),
+               'hours_bank_ids':fields.one2many('employee.hours.bank','timesheet_id','Hours Bank'),
                'schedule_shift':fields.float('Scheduled Shift'),
-               'over_under_time':fields.function(get_total_overtime, method=True, string='Overtime',type='float'),
+               'over_under_time':fields.function(get_total_banked_overtime, method=True, string='Total Overtime',type='float'),
 	           'week_no':fields.function(get_week_no,method=True, string = "Week",type= 'char'),
                'total_difference':fields.function(get_diff,method=True, string = "Difference",type= 'float'),
                'remarks':fields.selection([('Deficiency','Deficiency'),('Ok','Ok'),('Overtime','Overtime')],'State'),
+               'overtime_status':fields.selection([('Banked','Banked'),('Encashed','Encashed')],'Overtime Status'),
+               
         }
     _defaults = {
         'date_from':_get_week_startdate,
@@ -4883,27 +4951,47 @@ class attendance_adjustment_lines(osv.osv):
         result = super(osv.osv, self).create(cr, uid, vals, context)
         rec = self.browse(cr,uid,result)
         rec_timesheet = self.pool.get('hr_timesheet_sheet.sheet').browse(cr,uid,rec.timesheet_idd.id)
-        previous_input = 0
-        for timesheet in rec_timesheet:
-            previous_input = previous_input+ abs(timesheet.over_under_time)
-        for att in rec:
-            adjustment_input = rec.input_hours
-            if adjustment_input + previous_input > rec_timesheet.over_under_time:
-                raise osv.except_osv(('Input Hours Exceeds'),('Your adjustment hours increase for total OT/UT.'))
-            if rec_timesheet.remarks == 'Deficiency':
-                if vals['over_time_adjustemnt'] != 'adjust_from_bank':
-                    raise osv.except_osv(('Wrong Decision'),('You must adjust your hours from bank'))
-            elif rec_timesheet.remarks == 'Overtime' or rec_timesheet.remarks == 'Ok':
-                    if vals['over_time_adjustemnt'] == 'adjust_from_bank':
-                        raise osv.except_osv(('Wrong Decision'),('Your must Bank your hours, to get Paid.'))
+        
+        if rec_timesheet.total_timesheet < rec_timesheet.schedule_shift:
+            if rec_timesheet.over_under_time > 0:
+                adjustment_check = vals['input_hours'] + rec_timesheet.display_total_timesheet
                 
-                
-            vals ['duration'] = rec_timesheet.date_from + " to "+rec_timesheet.date_to
-            vals ['regular_hours'] = 40
-            vals ['over_under_time'] = rec_timesheet.total_attendance - 40
-            vals ['state'] = rec_timesheet.remarks 
-            self.write(cr, uid, result, vals)
+                if adjustment_check >= rec_timesheet.schedule_shift: 
+                    if adjustment_check > rec_timesheet.schedule_shift:
+                        raise osv.except_osv(('Hours Exceeded'),('you need to have hours equal to your schedule shift!'))
+                    else:
+                        rec_timesheet.display_total_timesheet = rec_timesheet.display_total_timesheet + rec.input_hours
+                        self.pool.get('employee.hours.bank').create(cr,uid,{'employee_id':rec_timesheet.employee_id.id,'debit':0, 'credit': rec.input_hours, 'description': 'Deficiency Adjusted', 'timesheet_id': rec.timesheet_idd.id})
+
+                        vals ['duration'] = rec_timesheet.date_from + " to "+rec_timesheet.date_to
+                        vals ['regular_hours'] = 40
+                        vals ['over_under_time'] = rec_timesheet.total_attendance - 40
+                        vals ['state'] = rec_timesheet.remarks 
+                        self.write(cr, uid, result, vals)
+                else:
+                    raise osv.except_osv(('Add more Hours'),('you need to have hours equal to your schedule shift!'))
+            else:
+                raise osv.except_osv(('Not Enough Hours'),('You do not have hours in your hours bank!'))
+        else:
+            raise osv.except_osv(('No Need For Adjustment'),('You already have adequate hours in timesheet!'))
+#         previous_input = 0
+#         for timesheet in rec_timesheet:
+#             previous_input = previous_input+ abs(timesheet.over_under_time)
+#         for att in rec:
+#             adjustment_input = rec.input_hours
+#             if adjustment_input + previous_input > rec_timesheet.over_under_time:
+#                 raise osv.except_osv(('Input Hours Exceeds'),('Your adjustment hours increase for total OT/UT.'))
+#             if rec_timesheet.remarks == 'Deficiency':
+#                 if vals['over_time_adjustemnt'] != 'adjust_from_bank':
+#                     raise osv.except_osv(('Wrong Decision'),('You must adjust your hours from bank'))
+#             elif rec_timesheet.remarks == 'Overtime' or rec_timesheet.remarks == 'Ok':
+#                     if vals['over_time_adjustemnt'] == 'adjust_from_bank':
+#                         raise osv.except_osv(('Wrong Decision'),('Your must Bank your hours, to get Paid.'))
+#                 
+#                 
+     
         return vals
+      
     
     def default_get(self, cr, uid, fields, context=None):
         if context is None:
@@ -4954,7 +5042,7 @@ class attendance_adjustment_lines(osv.osv):
         'regular_hours':fields.float('Regular'),
         'over_under_time':fields.float('OT/UT'),
         'input_hours':fields.float('Adjustment'),
-        'over_time_adjustemnt':fields.selection([('Bank_vertime','Bank Overtime'),('Paid','Get Paid'),('adjust_from_bank','Adjust From Bank')], 'Decision', required=True),
+        'over_time_adjustemnt':fields.selection([('Paid','Get Paid')], 'Decision', required=True),
         'state':fields.selection([('Deficiency','Deficiency'),('Ok','Ok'),('Overtime','Overtime')],'State'),
         'reconcile':fields.boolean('reconcile')
     }
@@ -4970,18 +5058,21 @@ class hr_expense_expense(osv.osv):
         super(hr_expense_expense, self).expense_accept(cr, uid, ids, context)
         for f in self.browse(cr,uid,ids):
             expenselines_ids = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.id)])
+#             rec_expline =  self.pool.get('hr.expense.line').browse(cr,uid,f.id)
             if expenselines_ids:
-                exists = self.pool.get('project.expenses').search(cr, uid, [('expense_id','=',f.id)])
-                if not exists:
-                    self.pool.get('project.expenses').create(cr,uid,{'expense_id':f.id,'project_id':f.project_id.id})
                     
                 #step 2 create entry in project expense lines table
-                for expline in expenselines_ids:
-                    exists = self.pool.get('project.expenses')
-                    expline_id = self.pool.get('prj.billing.expenseline').create(cr,uid,{'expenseline_id':expline,'project_id':f.project_id.id})
+                rec_expline =  self.pool.get('hr.expense.line').browse(cr,uid,expenselines_ids)
+                for expline in rec_expline:
+                    
+#                     exists = self.pool.get('project.expenses').search(cr, uid, [('expense_id','=',f.id)])
+#                     if not exists:
+                    self.pool.get('project.expenses').create(cr,uid,{'expense_id':f.id,'project_id':expline.project_id.id})
+                   
+                    expline_id = self.pool.get('prj.billing.expenseline').create(cr,uid,{'expenseline_id':expline.id,'project_id':expline.project_id.id})
 
                     #step 3 also create record in another project expense table
-                    self.pool.get('project.expenses.incurred').create(cr,uid,{'related_expense_id':expline_id,'name':f.project_id.id})
+                    self.pool.get('project.expenses.incurred').create(cr,uid,{'related_expense_id':expline_id,'name':expline.project_id.id})
 
 
         return self.write(cr, uid, ids, {'state': 'accepted', 'date_valid': time.strftime('%Y-%m-%d'), 'user_valid': uid}, context=context)
@@ -5034,7 +5125,7 @@ class hr_expense_expense(osv.osv):
                 total += line.taxes_paid
             res[expense.id] = total
         return res
-	
+	# at present we omitted calling this method because of a conflit with child object
     def onchange_rpjmanager(self, cr, uid, ids, project_id,dept_id):
         res =  {}
         _logger.info("%%%%%%%%%%%%%%%%%% expense onchange called project id : %s",project_id)
@@ -5072,7 +5163,8 @@ class hr_expense_expense(osv.osv):
    
     _name = 'hr.expense.expense'
     _inherit = "hr.expense.expense"
-    _columns = {'project_id':fields.many2one('project.project','Project',required =True),
+    _columns = {
+#     'project_id':fields.many2one('project.project','Project',required =True),
 	'pro_manager':fields.many2one('res.users','Manager',required =True),
 	'date': fields.datetime('Date', select=True, readonly=True, states={'draft':[('readonly',False)], 'confirm':[('readonly',False)]}),
     'date_valid': fields.datetime('Validation Date', select=True, copy=False, help="Date of the acceptation of the sheet expense. It's filled when the button Accept is pressed."),
@@ -5087,6 +5179,7 @@ class hr_expense_expense(osv.osv):
 	}
     
 hr_expense_expense()
+
 class budget_tag(osv.osv):
     _name = "budget.tag"
     _columns = {
@@ -5098,6 +5191,7 @@ class budget_tag(osv.osv):
     ]
 
 budget_tag()
+
 class expense_type(osv.osv):
     _name = "expense.type"
     _columns = {
@@ -5109,8 +5203,10 @@ class expense_type(osv.osv):
     ]
 
 expense_type()
+
 class ocl_hr_expense(osv.osv):
-    
+     
+       
     def calc_amount(self, cr, uid, ids, name, args, context=None):
         result = {}
        
@@ -5127,6 +5223,8 @@ class ocl_hr_expense(osv.osv):
     _inherit = "hr.expense.line"
     _columns = {
 #        'taxes_paid': fields.function(seteax, method=True, string='Taxes Paid By',type='float'),
+        'project_id': fields.many2one('project.project'),
+        'credit_card': fields.boolean('Credit Card'),
         'taxes_paid': fields.float('Taxes Paid'),
         'receipt_no': fields.char('Attached Receipt #'),
 		'budget_tags':fields.many2many('budget.tag',string ='Budget Tag'),
@@ -5172,6 +5270,7 @@ class project_expenses(osv.osv):
     def expense_lines(self, cr, uid, ids,field_names, context=None, check=True):
         """ """
         result = {}
+        flag = True
         for f in self.browse(cr, uid, ids, context=context):
             result[f.id] = {}
             if type(field_names) is not list:
@@ -5187,85 +5286,86 @@ class project_expenses(osv.osv):
                 if exlines:
                     for key_str in field_names:
                         result[f.id][key_str] = 0.0
-
                     if 'flight'  in field_names:
-                        flightid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Flight')])
-                        if flightid:
-                            flightines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',flightid[0])])
-                            if flightines:
-                                flighttrec = self.pool.get('hr.expense.line').browse(cr,uid,flightines[0])
-                                result[f.id]['flight'] = flighttrec.unit_amount
+                        if flag == True:
+                            flightid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Flight')])
+                            if flightid:
+                                flightines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',flightid)])
+                                if flightines:
+                                    flighttrec = self.pool.get('hr.expense.line').browse(cr,uid,flightines)
+                                    result[f.id]['flight'] = flighttrec.unit_amount
+                                    flag = False
                     #.................................................................................................................................................#
                     if 'hotel'  in field_names:
                         hotelid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Hotel')])
                         if hotelid:
-                            hotelines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',hotelid[0])])
+                            hotelines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',hotelid)])
                             if hotelines:
-                                hoteltrec = self.pool.get('hr.expense.line').browse(cr,uid,hotelines[0])
+                                hoteltrec = self.pool.get('hr.expense.line').browse(cr,uid,hotelines)
                                 result[f.id]['hotel'] = hoteltrec.unit_amount
                     #.................................................................................................................................................#
                     if 'meals'  in field_names:
                         mealid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Meals')])
                         if mealid:
-                            meallines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',mealid[0])])
+                            meallines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',mealid)])
                             if meallines:
-                                mealtrec = self.pool.get('hr.expense.line').browse(cr,uid,meallines[0])
+                                mealtrec = self.pool.get('hr.expense.line').browse(cr,uid,meallines)
                                 result[f.id]['meals'] = mealtrec.unit_amount
                     #..................................................................................................................................................#
                     if 'transport'  in field_names:
                         transportlid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Transport')])
                         if transportlid:
-                            transportllines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',transportlid[0])])
+                            transportllines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',transportlid)])
                             if transportllines:
-                                transportrec = self.pool.get('hr.expense.line').browse(cr,uid,transportllines[0])
+                                transportrec = self.pool.get('hr.expense.line').browse(cr,uid,transportllines)
                                 result[f.id]['transport'] = transportrec.unit_amount
                     #..................................................................................................................................................#
                     if 'telecom'  in field_names:
                         telecomid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Telecom')])
                         if telecomid:
-                            telecomlines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',telecomid[0])])
+                            telecomlines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',telecomid)])
                             if telecomlines:
-                                telecomtrec = self.pool.get('hr.expense.line').browse(cr,uid,telecomlines[0])
+                                telecomtrec = self.pool.get('hr.expense.line').browse(cr,uid,telecomlines)
                                 result[f.id]['telecom'] = telecomtrec.unit_amount
                     #...................................................................................................................................................#
                     if 'material'  in field_names:
                         materiallid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Material')])
                         if materiallid:
-                            materiallines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',materiallid[0])])
+                            materiallines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',materiallid)])
                             if materiallines:
-                                materialtrec = self.pool.get('hr.expense.line').browse(cr,uid,materiallines[0])
+                                materialtrec = self.pool.get('hr.expense.line').browse(cr,uid,materiallines)
                                 result[f.id]['material'] = materialtrec.unit_amount
                     #....................................................................................................................................................#
                     if 'tools'  in field_names:
                         toolslid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Tools')])
                         if toolslid:
-                            toolslines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',toolslid[0])])
+                            toolslines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',toolslid)])
                             if toolslines:
-                                toolstrec = self.pool.get('hr.expense.line').browse(cr,uid,toolslines[0])
+                                toolstrec = self.pool.get('hr.expense.line').browse(cr,uid,toolslines)
                                 result[f.id]['tools'] = toolstrec.unit_amount
                     #...................................................................................................................................................#
                     if 'fleet'  in field_names:
                         fleetid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Fleet')])
                         if fleetid:
-                            fleetlines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',fleetid[0])])
+                            fleetlines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',fleetid)])
                             if fleetlines:
-                                fleettsrec = self.pool.get('hr.expense.line').browse(cr,uid,fleetlines[0])
+                                fleettsrec = self.pool.get('hr.expense.line').browse(cr,uid,fleetlines)
                                 result[f.id]['fleet'] = fleettsrec.unit_amount
                     #..................................................................................................................................................#
                     if 'parking'  in field_names:
                         parkingid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Parking')])
                         if parkingid:
-                            parkinglines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',parkingid[0])])
+                            parkinglines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('project_id', '=', f.project_id.id),('expense_types','=',parkingid)])
                             if parkinglines:
-                                parkingtrec = self.pool.get('hr.expense.line').browse(cr,uid,parkinglines[0])
+                                parkingtrec = self.pool.get('hr.expense.line').browse(cr,uid,parkinglines)
                                 result[f.id]['parking'] = parkingtrec.unit_amount
                     #..................................................................................................................................................#
                     if 'misc'  in field_names:
                         miscid =  self.pool.get('expense.type').search(cr, uid, [('name','=','Misc')])
                         if miscid:
-                            misclines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',miscid[0])])
+                            misclines = self.pool.get('hr.expense.line').search(cr, uid, [('expense_id','=',f.expense_id.id),('expense_types','=',miscid)])
                             if misclines:
-                                misctrec = self.pool.get('hr.expense.line').browse(cr,uid,misclines[0])
+                                misctrec = self.pool.get('hr.expense.line').browse(cr,uid,misclines)
                                 result[f.id]['misc'] = misctrec.unit_amount
                     #...................................................................................................................................................#
     #                if 'taxes'  in field_names:
@@ -5450,14 +5550,26 @@ class hr_analytic_timesheet(osv.osv):
         
 hr_analytic_timesheet()
 
-# 
-# class employee_hours_bank(osv.osv):
-#     
-#     _columns = {
-#                 
-#         'date_entered' : fields.Date.today(),
-#         'description' : fields.char('Description'),
-#         
-#                 }
 
+
+class employee_hours_bank(osv.osv):
+      
+    _name = "employee.hours.bank"
+    _description = "Timesheet Employee Hours"
+#     _inherit = 'hr.analytic.timesheet' 
+    _columns = {       
+        'date_entered':fields.date('Date'),
+        'description':fields.char('Description'),
+        'timesheet_id':fields.many2one('hr_timesheet_sheet.sheet','Timesheet'),
+        'employee_id':fields.many2one('hr.employee'),
+        #week no is not needed, the m2o to timesheet id is returning the same label
+        'week_num':fields.related('timesheet_id','week_no','Week No'),
+        'debit':fields.float('Debit'),
+        'credit':fields.float('Credit'),
+        'balance':fields.float('Balance')
+          
+                }
+    
+
+employee_hours_bank()
 
