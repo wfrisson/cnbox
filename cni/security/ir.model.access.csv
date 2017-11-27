@@ -192,3 +192,7 @@
 "204","project.net.margin","model_project_net_margin","group_cni_admin",1,1,1,1
 "205","prj.billing.expenseline","model_prj_billing_expenseline","group_cni_technician",1,1,1,0
 "206","hr.contract","hr_contract.model_hr_contract","group_cni_technician",1,0,0,0
+"207","employee.hours.bank","model_employee_hours_bank","group_cni_administrator2",1,1,1,1
+"208","employee.hours.bank","model_employee_hours_bank","group_cni_technician",1,1,1,1
+"209","employee.hours.bank","model_employee_hours_bank","group_cni_project_manager",1,1,1,1
+"210","employee.hours.bank","model_employee_hours_bank","group_cni_admin",1,1,1,1

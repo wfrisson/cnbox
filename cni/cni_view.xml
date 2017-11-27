@@ -7,13 +7,19 @@
 	<field name="model">hr_timesheet_sheet.sheet</field>
 	<field name = "inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form" />
 	<field name = "arch" type = "xml">
-		<xpath expr = "//field[@name = 'total_attendance']" position = "replace">
+		<xpath expr = "//field[@name = 'date_from']" position = "before">
 		<field name = "schedule_shift" readonly = "1"/>
 		</xpath>
-		<xpath expr = "//field[@name = 'total_timesheet']" position="replace">
-		<field name="display_total_timesheet" readonly = "1"/>
-		<!--<attribute name="string">Total Timesheet</attribute>-->
-		</xpath>
+	<xpath expr = "//field[@name = 'total_timesheet']" position = "after">
+		<field name = "banked_hours" />
+		<field name = "total_hours_this_timesheet" style="color:red" />
+		<field name="total_overtime"  help="Total Timesheet - Scheduled Shift"/>
+		
+	</xpath>	
+	<xpath expr = "//field[@name = 'total_overtime']" position = "after">
+		<field name="bank_it" />
+	</xpath>
+		
 		
 	</field>
 	</record>
@@ -25,16 +31,12 @@
 	<field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
 	<field name="type">form</field>
 	<field name="arch" type="xml">
-		<field name="total_difference" position="after" help="Scheduled Shift - Total Timesheet">
-		<field name="total_overtime"  help="Total Timesheet - Scheduled Shift"/>
-		<field name="overtime_status" readonly= "1"/>
-	</field>
+		
 	<notebook>
 		<page string = "Banked Overtime">
-			<group><field name="total_hours" readonly = "1" /><field name="remarks" readonly = "1" /></group>
 			<group><field name="over_under_time" readonly = "1" /></group>
 			<field name="adjustment_ids" context = " {'parent_id':active_id}" /><!--this object will be removed if not needed -->
-			<field name="hours_bank_ids"  widget="one2many_list" invisible ="1">
+			<field name="hours_bank_ids" widget="one2many_list" invisible="1">
 							<tree>
 							<field name="date_entered" readonly="1" /> 
 							<field name="timesheet_id" readonly="1" /> 
@@ -827,10 +829,14 @@ this code may be later on uncommented when we successfull separating tasks stage
 <record model = "ir.ui.view" id = "timesshet_tree_inh1">
 <field name = "name">timesheet.tree.inherited</field>
 <field name = "model">hr_timesheet_sheet.sheet</field>
-<field name = "inherit_id" ref = "hr_timesheet_sheet.hr_timesheet_sheet_tree_simplified"/>
+<field name = "inherit_id" ref = "hr_timesheet_sheet.hr_timesheet_sheet_form"/>
 <field name = "arch" type = "xml">
 	<xpath expr = "//field[@name = 'employee_id']" position = "after">
-		<field name = "week_no"/>
+		<field name = "week_no" invisible="1"/>
+	</xpath>
+	
+	<xpath expr = "//field[@name = 'total_difference']" position="replace">
+    	<field name="total_difference" invisible="1"/>
 	</xpath>
 </field>
 </record>
@@ -1452,6 +1458,17 @@ this code may be later on uncommented when we successfull separating tasks stage
 	<field name="limit">80</field>
     <field name="view_type">form</field>
 </record>
+<record id = "view_expense_type_tree" model = "ir.ui.view">
+	<field name = "name">expense.type.tree</field>
+	<field name = "model">expense.type</field>
+	<field name = "arch" type = "xml">
+		<tree>
+			<field name="id" string= "ID"/>
+			<field name="name" string= "Expense Type"/>
+			<field name="desc" string= "Description"/>
+		</tree>
+	</field>
+</record>
 
 <record id="action_project_project_2_project_task_all" model="ir.actions.act_window">
     <field name="name">Workload</field>
@@ -1958,18 +1975,26 @@ this code may be later on uncommented when we successfull separating tasks stage
 								<field name="expdate" string="Date"/>
 								<field name="expensed_by" string="Incurred By"/>
 								<field name="desc" string="Expense Description"/>
+
+								<field name="telecom" string="Communication($)" sum="$" />
 								<field name="flight" string="Flight($)" sum="$" />
 								<field name="hotel" string="Hotel($)" sum="$" />
-								<field name="meals" string="Meals($)" sum="$" />
-								<field name="transport" string="Transport($)" sum="$" />
-								<field name="telecom" string="Telecom($)" sum="$" />
 								<field name="material" string="Material($)" sum="$" />
 								<field name="tools" string="Tools($)" sum="$" />
-								<field name="fleet" string="Fleet($)" sum="$" />
+								<field name="public" string="Public Transit($)" sum="$" />
 								<field name="parking" string="Parking($)" sum="$" />
-								<field name="misc" string="Misc($)" sum="$" />
+								<field name="fleet" string="Fleet Gas &amp; Maintenance($)" sum="$" />
+								<field name="transport" string="Ground Transportation($)" sum="$" />
+								<field name="travel" string="Per Diem($)" sum="$" />
+								<field name="misc" string="Miscellaneous($)" sum="$" />
+								<field name="personal" string="Personal Car KMs usage ($)" sum="$" />
+								<field name="mileage" string="Mileage Reimbursement($)" sum="$" />
+								<field name="meals" string="Meals &amp; Entertainment($)" sum="$" />
+								<field name="cash" string="Cash Advance($)" sum="$" />
+								
 								<field name="taxes" string="Taxes($)" sum="$" />
 								<field name="total" string="Total Charge($)" sum="$"/>
+								
 							</tree>
 							<form>
 								<group  width = "100%" col = "6" string = "Expense By">
@@ -1978,22 +2003,21 @@ this code may be later on uncommented when we successfull separating tasks stage
 									<field name="desc" string="Expense Description"/>
 								</group>
 								<group  width = "100%" col = "6" string = "Expense Detail">
+									<field name="telecom" string="Communication"/>
 									<field name="flight" string="Flight"/>
 									<field name="hotel" string="Hotel"/>
-									<field name="meals" string="Meals"/>
-									<field name="transport" string="Transport"/>
-									
-									<field name="telecom" string="Telecom"/>
 									<field name="material" string="Material"/>
 									<field name="tools" string="Tools"/>
-									<field name="fleet" string="Fleet"/>
-									
+									<field name="public" string="Public Transit"/>
 									<field name="parking" string="Parking"/>
-									<field name="misc" string="Misc"/>
-									<field name="taxes" string="Taxes"/>
-									
-									<field name="expense_id" invisible="1"/>
-									<field name="project_id" invisible="1"/>
+									<field name="fleet" string="Fleet Gas &amp; Maintenance"/>
+									<field name="transport" string="Ground Transportation"/>
+									<field name="travel" string="Per Diem"/>
+									<field name="misc" string="Miscellaneous"/>
+									<field name="personal" string="Personal Car KMs usage"/>
+									<field name="mileage" string="Mileage Reimbursement"/>
+									<field name="meals" string="Meals &amp; Entertainment"/>
+									<field name="cash" string="Cash Advance"/>
 								</group>
 								<group  width = "100%" col = "2" string = "Total Expense">
 									<field name="total"/>
@@ -2446,6 +2470,9 @@ this code may be later on uncommented when we successfull separating tasks stage
 					<field name="consumable_products_ids" readonly="1"/>
 			    </page>						    	
 			</notebook>
+			<xpath expr="/form/sheet[@string='Task']/notebook/page[@string='Description']/field[@name='work_ids']/tree[@string='Task Work']/field[@name='hours']" position="attributes">
+			  <attribute name="groups">cni.group_cni_project_manager</attribute>
+			</xpath>
 			<xpath expr="/form/sheet[@string='Task']/notebook/page[@string='Description']/field[@name='work_ids']/tree[@string='Task Work']/field[@name='hours']" position="before">
 			  <field name="activity_time" widget="float_time" string="Budget Hours" groups = "cni.group_cni_project_manager"/>
 			</xpath>
@@ -2545,7 +2572,8 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 		      <field name="inherit_id" ref="hr.view_employee_form"/>
 		      <field name="arch" type="xml">
 		       <xpath expr='//page[@string="Personal Contact"]' position="after">
-            	<page string="Hours Bank">
+            	<page string="Hours Bank" invisible="1">
+<!-- Employee Hours Bank Tab on Employee Details Page -->
                     <field name="hours_bank" widget="one2many_list" colspan="4" readonly="1">
 						<tree>
 							<field name="date_entered"/>
@@ -2688,20 +2716,6 @@ this portion of code may late ron un commented when we are sucsessfull to separa
             <field name="name">My Profile</field>
         </record>
  
-<!--Expense tree inherited
-		<record model = "ir.ui.view" id = "view_expenses_tree_ihrt">
-			<field name = "name">view_expenses_tree.tree.inhr</field>	
-			<field name = "model">hr.expense.expense</field>
-			<field name = "inherit_id" ref = "hr_expense.view_expenses_tree"/>
-			<field name = "arch" type = "xml">
-				<xpath expr = "//field[@name ='employee_id']" position = "after">
-				<field name = "project_id"/>
-				</xpath>
-			</field>
-
-
-		</record>
--->
        
 <!--filter Enpenses per employee-->
 <record id="ir_actions_epenses_per_employee" model="ir.actions.server">
@@ -2741,12 +2755,9 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 				<field name="date_to"  position = "replace"/>
 				<group>
 					<group>
-						<field name="date_from" required = "1" on_change="onchange_date(date_from, 'compare_date_from')" />
-						<field name="date_to" required = "1" on_change="onchange_date(date_from,' compare_date_to')" />
-					</group>
-					<group>
-					<field name="bank_it" />
-					</group>
+						<field name="date_from" required = "1"/>
+						<field name="date_to" required = "1"/>
+					</group>					
 				</group>
 				<xpath expr = "//field[@name ='account_id']" position="attributes">
 					<attribute name="invisible">1</attribute>
@@ -2769,7 +2780,7 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 					<field name="comments"/>
 				</xpath>
 				<xpath expr = "//field[@name ='unit_amount']" position="before">
-					<field name="start_time" widget="float_time"/>
+					<field name="start_time" widget="float_time" on_change="set_onchange_endtime(start_time,end_time)"/>
 					<field name="end_time" widget="float_time" on_change="set_onchange_endtime(start_time,end_time)"/>
 				</xpath>
 				<!-- <xpath expr = "//field[@name ='name']" position="attributes">
@@ -2797,8 +2808,8 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 		        
 		        <field name="timesheet_idd" readonly = "1"/>
 		        <field name="duration" readonly = "1"/>
-				<field name="regular_hours" invisible = "1" />
-				<field name="over_under_time" invisible = "1"/>
+				<field name="regular_hours" readonly = "1"  invisible="1"/>
+				<field name="over_under_time" readonly = "1" invisible="1"/>
 				<field name="input_hours"  required = "1"/>
 				<field name="over_time_adjustemnt" on_change="onchange_decision(over_time_adjustemnt,'state')" readonly="1"/>
 				<field name="state" invisible = "1"/>
@@ -2828,11 +2839,19 @@ this portion of code may late ron un commented when we are sucsessfull to separa
 				<xpath expr="//field[@name='name']" position="before">
 					<field name="pro_manager" string="Expense Manager"/>				
 				</xpath>
+				<xpath expr="//field[@name='employee_id']" position="before">
+					<field name="reporting_office" domain="[('is_company','=',1)]" on_change="onchange_address_id(reporting_office)"
+                                            context="{'show_address': 1, 'default_customer': False}"
+                                            options='{"always_reload": True, "highlight_first_line": True}'/>				
+				</xpath>
 				<xpath expr="//field[@name='user_valid']" position="replace">
 					<field name="user_valid" string="Approved By" attrs="{'invisible': [('state','=','draft')]}" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'base.group_hr_user']}"/>
 				</xpath>
 				<xpath expr = "//field[@name ='name']" position="attributes">
-					<attribute name="required">False</attribute>
+					<attribute name="String">Description</attribute>
+				</xpath>				
+				<xpath expr = "//field[@name ='name']" position="attributes">
+					<attribute name="required">True</attribute>
 				</xpath>				
 				<xpath expr = "//field[@name ='department_id']" position="replace">
 				</xpath>
@@ -2857,7 +2876,7 @@ this portion of code may late ron un commented when we are sucsessfull to separa
         </xpath>-->
 		
 		 <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='date_value']" position="after">
-			<field name = "project_id" string="Reporting Office" />
+			<field name = "project_id" string="Project" />
         </xpath>
 		
         <xpath expr="/form/sheet/notebook/page[@string='Description']/field[@name='line_ids']/tree[@string='Expense Lines']/field[@name='project_id']" position="after">
